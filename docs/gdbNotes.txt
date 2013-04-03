@@ -1,0 +1,63 @@
+--DUMPING THE CORE
+ulimit -c unlimited // run this in terminal to dump the core on seg fault
+
+--EXECUTION
+run //starts running the program
+continue //resumes program
+Ctrl+C //while running stops program like breakpoint
+list // print lines of code above and below where program is stopped
+next //Increments program execution by 1, skips over function calls.
+step //same as next but goes into function calls.
+print //print variable values ex: "print x" would print the value of variable x
+set //"set x" sets the value of x mid run
+finish //finishes the current executing function,shows what the func returned.
+call func() //calls any function linked into the program. This includes your 
+            //own code as well as standard library functions Ex:"call abort()"
+
+--STACK
+backtrace //give you a backtrace from the current function
+frame #//changes stack fromes to frame # (where # is a number)
+info frame //displays info about the current frame
+info locals //displays the list of local var and their values for the current 
+            //stack frame
+info args //displays the list of arguments to the program.
+
+--BREAKPOINTS
+break 19 //would set a breakpoint on line 19 if you have one source file
+break foo.c:19 //would set a breakpoint on line 19 of foo.c
+break func1 //sets a breakpoint on function "func1"
+break fooClass::bar(int) //sets a breakpoint on function bar in class fooClass.
+tbreak //if used in place of break, only stops program once and is then removed
+info breakpoints //gives a list of breakpoints
+disable #//disables the breakpoint with number #, # found in info breakpoints
+ignore x y //ignores breakpoint x, y times.
+
+--WATCHPOINTS
+watch x //sets a watchpoint on variable x. Will stop when it is written to
+rwatch x //identical to watch but for reads instead of writes.
+awatch x //read/write watchpoint
+info breakpoints //also lists watchpoints
+disable # //also can disable watchpoints, just like breakpoints
+
+--ADVANCED
+x/s s //examine memory storing variable s as a string.
+x/c s //examine memory storing variable s as a char.
+x/4c s //examine memory storing variable s as 4 chars.
+x/t s //examine the first 32 bits of the variable s in binary
+x/3x s //examine the first 24 bytes of the variable in hex
+
+info registers //shows what is in the registers
+
+core core //loads the core file "core" from a seg fault. 
+          //"core" is the usual name for this file.
+
+nexti
+stepi //these two commands function like next and step except they 
+      //step through at the assembly instruction level.
+
+disassemble main //shows the assembly code for the main function.
+
+
+
+
+
