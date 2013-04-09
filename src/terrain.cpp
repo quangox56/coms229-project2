@@ -101,11 +101,9 @@ istream& terrain::operator>>(istream& in, terrain& cTerrain)
                 keywordsFound[i] = true;
             }
         }
-        string keyword;
         if(keywordFound)
         {
-            keyword = tmp;
-
+            handleKeyword(iss, keyword);
         }
     }
 
@@ -113,7 +111,7 @@ istream& terrain::operator>>(istream& in, terrain& cTerrain)
 
 }
 
-void handleKeyword(istringstream&, string keyword)
+void handleKeyword(istringstream& iss, string keyword)
 {
     switch(keyword)
     {

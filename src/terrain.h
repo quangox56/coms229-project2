@@ -1,6 +1,8 @@
 #define NUM_KEYWORDS 3
 #define KEYWORDS {"Xrange", "Yrange", "Initial"}
 
+enum cell {DEAD, ALIVE};
+
 class terrain
 {
     private:
