@@ -1,28 +1,40 @@
+#ifndef TERRAIN_H
+#define TERRAIN_H
+
+#include<iostream>
+#include<sstream>
+#include<cstdlib>
+#include<vector>
+#include<string>
+
 #define NUM_KEYWORDS 3
 #define KEYWORDS {"Xrange", "Yrange", "Initial"}
+
 
 enum cell {DEAD, ALIVE};
 
 class terrain
 {
     private:
-    cell cells[][]; //rows are y, columns are x
+    //private member variables
+    vector< vector<cell> > cells; //rows are y, columns are x
     int xRangeLow;
     int xRangeHigh;
     int yRangeLow;
     int yRangeHigh;
-
-    void parseAut();
-
+    bool isValid;
 
 
 
-
+    //private member functions
     void handleKeyword(istringstream&);
 
     public:
-    istream& operator>>(istream& in, terrain &cTerrain);
+    //public member functions
+    terrain();
+    istream& operator>>(istream& in);
 
     
 
 }
+#endif

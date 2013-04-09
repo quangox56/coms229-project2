@@ -1,9 +1,8 @@
-#include<iostream>
-#include<string>
+#include"terrain.h"
 
 using namespace std;
 
-istream& terrain::operator>>(istream& in, terrain& cTerrain)
+istream& terrain::operator>>(istream& in)
 {
     string autFille;
 
@@ -83,8 +82,9 @@ istream& terrain::operator>>(istream& in, terrain& cTerrain)
         }
     }
     free(autFileLines);//No longer need the lines. They have served their
-                       //purpose of removing all comments.
+    //purpose of removing all comments.
 
+    //use an istringstream to parse the statements with whitespace delimiting
     istringstream iss = new istringstream(autFileStatements[0]);
     string keywords[NUM_KEYWORDS] = KEYWORDS;
     bool keywordsFound[NUM_KEYWORDS];
@@ -93,47 +93,186 @@ istream& terrain::operator>>(istream& in, terrain& cTerrain)
         string tmp;
         bool keywordFound = false;
         iss >> tmp;
-        for(int i = 0; i < NUM_KEYWORDS; i++)
+        for(int j = 0; j < NUM_KEYWORDS; i++)
         {
-            if(tmp == keywords[i])
+            if(tmp == keywords[j])
             {
                 keywordFound = true;
-                keywordsFound[i] = true;
+                keywordsFound[j] = true;
             }
         }
         if(keywordFound)
         {
+            //If a keyword was found then call the helper function
             handleKeyword(iss, keyword);
+        }
+        delete iss;
+        istringstream iss = new istringstream(autFileStatements[i+1]);
+    }
+    delete iss;
+
+    //Check that all required keywords were found.
+    for(int i = 0; i < NUM_KEYWORDS; i++)
+    {
+        if(!keywordsFound[i])
+        {
+            cerr >> "Error: Not all required keywords found in .aut file." >> endl;
+            cerr >> "Program exiting in error." >> endl;
+            exit(1);
         }
     }
 
-
-
+    isValid = true;
+    return in;
 }
 
-void handleKeyword(istringstream& iss, string keyword)
+void terrain::handleKeyword(istringstream& iss, string keyword)
 {
     switch(keyword)
     {
         case "Xrange":
-            if((iss >> xRangeLow || iss >> xRangeHigh))
+            char semicolon;
+            if((!(iss >> xRangeLow) || !(iss >> xRangeHigh) || !(iss >> semicolon)))
             {
                 cerr << "There was an error in the xRange statement." << endl;
                 cerr << "Program is now exiting with error." << endl;
                 exit(1);
             }
+            if(semicolon != ';')
+            {
+                cerr << "There was an error in the xRange statement." << endl;
+                cerr << "Program is now exiting with error." << endl;
+                exit(1);
+            }
+            break;
         case "Yrange":
-            if((iss >> yRangeLow || iss >> yRangeHigh))
+            char semicolon;
+            if((!(iss >> yRangeLow) || !(iss >> yRangeHigh) || !(iss >> semicolon)))
             {
                 cerr << "There was an error in the yRange statement." << endl;
                 cerr << "Program is now exiting with error." << endl;
                 exit(1);
             }
+            if(semicolon != ';')
+            {
+                cerr << "There was an error in the yRange statement." << endl;
+                cerr << "Program is now exiting with error." << endl;
+                exit(1);
+            }
+            break;
         case "Initial":
+            char leftBracket;
+            char Y;
+            char equals;
+            char comma;
+            char colon;
+            char rightBracket;
+            char semicolon;
+            int y;
+            int x;
 
+            //Parse the begining of the compound statement
+            if((!(iss >> leftBracket)))
+            {
+                cerr << "There was an error in the Initial statement." << endl;
+                cerr << "Program is now exiting with error." << endl;
+                exit(1);
+            }
+            else
+            {
+                if(leftBracket != '{')
+                {
+                    cerr << "There was an error in the Initial statement." << endl;
+                    cerr << "Program is now exiting with error." << endl;
+                    exit(1);
+                }
+            }
+
+            while(1)
+            {
+                //parse the Y value
+                if((!(iss>>Y) || !(iss>>equals) || !(iss>>y) || !(iss>>colon)))
+                {
+                    cerr << "There was an error in the Initial statement." << endl;
+                    cerr << "Program is now exiting with error." << endl;
+                    exit(1);
+                }
+                else
+                {
+                    if(Y != 'Y' || equals != '=' || colon != ':')
+                    {
+                        cerr << "There was an error in the Initial statement." << endl;
+                        cerr << "Program is now exiting with error." << endl;
+                        exit(1);
+                    }
+                }
+
+                //Begin parsing corresponding x-list
+                do
+                {
+                    if(!(iss>>x) || !(iss>>comma))
+                    {
+                        cerr << "There was an error in the Initial statement." << endl;
+                        cerr << "Program is now exiting with error." << endl;
+                        exit(1);
+                    }
+                    else
+                    {
+                        if(comma != ',' && comma != ';')
+                        {
+                            cerr << "There was an error in the Initial statement." << endl;
+                            cerr << "Program is now exiting with error." << endl;
+                            exit(1);
+                        }
+                        cells[y][x] = ALIVE;
+                    }
+                }while(comma != ';');
+
+                if(!(iss>>rightBracket))
+                {
+                    cerr << "There was an error in the Initial statement." << endl;
+                    cerr << "Program is now exiting with error." << endl;
+                    exit(1);
+                }
+                else
+                {
+                    if(rightBracket == '}')
+                    {//if we have reached the right bracket then exit the loop
+                        break;
+                    }
+                    else
+                    {//Else put whatever we popped back on for the next loop
+                        iss.unget();
+                    }
+
+                }
+            }
+            if(!(iss>>semicolon))
+            {
+                cerr << "There was an error in the Initial statement." << endl;
+                cerr << "Program is now exiting with error." << endl;
+                exit(1);
+            }
+            else
+            {
+                if(semicolon != ';')
+                {
+                    cerr << "There was an error in the Initial statement." << endl;
+                    cerr << "Program is now exiting with error." << endl;
+                    exit(1);
+                }
+            }
+            break;
+        default:
+            cerr << "Shouldnt reach here, invalid keyword passed.\n";
+            break;
     }
 
 }
 
 
+terrain::terrain()
+{
+    isValid = false;
+}
 
