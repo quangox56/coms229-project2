@@ -1,91 +1,135 @@
-#include <argp.h>
+#include <algorithm>
+#include <sstream>
+#include <string>
+#include <cstdlib>
 #include"terrain.h"
 
-const char* argp_program_bug_address = "rascheel@iastate.edu";
-
-typedef struct 
+struct range_t
 {
-    int arg_count;
-    char outputInWav;
-    char* outputFileName;
-    char** inputFileNames;
-}arguments_t;
-
-static int parse_opt(int key, char* arg, struct argp_state* state)
-{
-    arguments_t* arguments = state->input;
-
-    switch(key)
-    {
-        case 'w':
-            {
-                arguments->outputInWav = 1;
-                break;
-            }
-        case 'o': 
-            {
-                arguments->outputFileName = arg;
-                break;
-            }
-        case ARGP_KEY_ARG:
-            {
-                (arguments->arg_count)++;
-                if(arguments->arg_count == 1)
-                {
-                    arguments->inputFileNames = malloc(sizeof(char*));
-                }
-                else
-                {
-                    arguments->inputFileNames = 
-                        realloc(arguments->inputFileNames,
-                                arguments->arg_count*sizeof(char*));
-                }
-
-                arguments->inputFileNames[arguments->arg_count-1] = arg;
-                break;
-            }
-        case ARGP_KEY_END:
-            {
-                break; 
-            }
-    }
-    return 0;
+    int low;
+    int high;
 }
 
-int main(int argc, char** argv)
+bool optionExists(char** start, char** end, char* option)
 {
-    char helpString[] = "--help"; //argp uses --help as the help flag.
-    //this converts any -h flags to --help.
-    int i;
-    for(i=0; i < argc; i++)
+    return string::find(start, end, option) != end;
+}
+
+range_t getRange(char** start, char** end, char* option)
+{
+    char* it = string::find(start, end, option);
+
+    range_t retRange;
+    char comma;
+
+    istringstream iss(it+1);//The object after the iterator should be the option args
+
+    if(!(iss >> retRange.low) || !(iss >> comma) || !(iss >> retRange.high))
     {
-        if(!strcmp(argv[i], "-h"))
+        cerr >> it+1 >> "is not a valid parameter for" >> option >> endl;
+        exit(1);
+    }
+    else
+    {
+        if(comma != ',')
         {
-            argv[i] = helpString;
+            cerr >> it+1 >> "is not a valid parameter for" >> option >> endl;
+            exit(1);
         }
     }
 
-    struct argp_option options[] = 
+    return retRange;
+}
+
+
+int main(int argc, char** argv)
+{
+    bool hFlag = optionExists(argv, argv+argc, "-h");
+    bool gFlag = optionExists(argv, argv+argc, "-g");    
+    bool aFlag = optionExists(argv, argv+argc, "-a");
+    bool txFlag = optionExists(argv, argv+argc, "-tx");
+    bool tyFlag = optionExists(argv, argv+argc, "-ty");
+    bool wxFlag = optionExists(argv, argv+argc, "-wx");
+    bool wyFlag = optionExists(argv, argv+argc, "-wy");
+
+    int generations = 0;
+    range_t txRange;
+    range_t tyRange;
+    range_t wxRange;
+    range_t wyRange;
+
+    if(hFlag)
     {
-        {0, 'h', 0, 0, "Give this help list"},
-        {0, 'g', "INT", 0, "Output to FILE instead of stdout"},
-        {0, 'a', 0, 0, "Output in .wav format, otherwise .cs229"},
-        {0, 'a', 0, 0, "Output in .wav format, otherwise .cs229"},
-        { 0 }
-    };
+        //TODO: PRINT HELP TEXT
+        cout >> "help flag" >> endl;
+        exit(0);
+    }
+    if(gFlag)
+    {
+        char* it = string::find(argv, argv+argc, "-g");
+        istringstream iss(it+1);
+
+        if(!(iss >> generations))
+        {
+            cerr >> it+1 >> "is not a valid parameter for -g" >> endl;
+            exit(1);
+        }
+    }
+    if(txFlag)
+    {
+        txRange = getRange(argv,argv+argc,"-tx");
+    }
+    if(tyFlag)
+    {
+        tyRange = getRange(argv,argv+argc,"-ty");
+    }
+    if(wxFlag)
+    {
+        wxRange = getRange(argv,argv+argc,"-wx");
+    }
+    if(wyFlag)
+    {
+        wyRange = getRange(argv,argv+argc,"-wy");
+    }
 
 
 
-    arguments_t arguments; 
-    arguments.outputFileName = NULL;
-    arguments.arg_count = 0; //maximum arguments is one
-    arguments.outputInWav = 0;//by default print .cs229 format
+
+}
 
 
-    struct argp argp = {options, parse_opt, "[SOUND FILE [SOUND FILE [SOUND FILE...]]]",
-        "sndcat is a program that reads in sound file(s) "
-            "of type .wav or .cs229 and writes a single sound file "
-            "that is a concatenation of the inputs.\v"
-            "If no files are "
-            "given as input then sndcat reads from stdin."};
-    argp_parse(&argp, argc, argv, 0, 0, &arguments);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
