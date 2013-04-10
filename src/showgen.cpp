@@ -3,12 +3,8 @@
 #include <string>
 #include <cstdlib>
 #include"terrain.h"
+#include"common.h"
 
-struct range_t
-{
-    int low;
-    int high;
-}
 
 bool optionExists(char** start, char** end, char* option)
 {
@@ -91,6 +87,7 @@ int main(int argc, char** argv)
     {
         wyRange = getRange(argv,argv+argc,"-wy");
     }
+
 
 
 

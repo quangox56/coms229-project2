@@ -6,12 +6,9 @@
 #include<cstdlib>
 #include<vector>
 #include<string>
-
-#define NUM_KEYWORDS 3
-#define KEYWORDS {"Xrange", "Yrange", "Initial"}
+#include"common.h"
 
 
-enum cell {DEAD, ALIVE};
 
 class terrain
 {
@@ -22,7 +19,9 @@ class terrain
     int xRangeHigh;
     int yRangeLow;
     int yRangeHigh;
+    bool rangesSet;
     bool isValid;
+    bool printAut;
 
 
 
@@ -35,7 +34,12 @@ class terrain
     public:
     //public member functions
     terrain();
+    terrain(range_t xRange, range_t yRange);
+    void setRange(range_t xRange, range_t yRange);
+    void setPrintModeAut(bool _printAut);
     istream& operator>>(istream& in);
+    ostream& operator<<(ostream& out);
+
 
     
 

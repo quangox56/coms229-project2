@@ -126,6 +126,29 @@ istream& terrain::operator>>(istream& in)
     return in;
 }
 
+ostream& terrain::operator<<(ostream& out)
+{
+    if(printAut)
+    {
+        out << "Xrange " << xRangeLow << " " << xRangeHigh;
+        out << "Yrange " << yRangeLow << " " << yRangeHigh;
+        out << "Initia {" << endl;
+            
+    }
+    else
+    {
+        for(int y = yRangeLow; y < yRangeHigh; y++)
+        {
+            for(int x = xRangeLow; x < xRangeLow; x++)
+            {
+                out << cells[y][x] ? "1":"~";
+            }
+            out << endl;
+        }
+    }
+
+}
+
 void terrain::resizeCells(size_t newSize)
 {
     if(newSize > cells.capacity())
@@ -238,7 +261,7 @@ void terrain::handleKeyword(istringstream& iss, string keyword)
                         }
                         if(x >= cells.capacity() || y >= cells.capacity())
                         {
-                            resizeCells(x > y ? x : y)//Resize it to the larger
+                            resizeCells(x > y ? x : y);//Resize it to the larger
                                                       //of the two
                         }
                         cells[y][x] = ALIVE;
@@ -291,7 +314,30 @@ void terrain::handleKeyword(istringstream& iss, string keyword)
 terrain::terrain()
 {
     isValid = false;
+    printAut = false;
+    rangesSet = false;
     //Start out with a 100x100 grid, expand later as needed.
     resizeCell(100);
 }
 
+terrain::terrain(range_t xRange, range_t yRange)
+{
+    isValid = false;
+    printAut = false;
+    xRangeLow = xRange.low;
+    xRangeHigh = xRange.high;
+    yRangeLow = yRange.low;
+    yRangeHigh = yRange.high;
+    rangesSet = true;
+
+    int xRangeSize = xRangeHigh - xRangeLow;
+    int yRangeSize = yRangeHigh - yRangeLow;
+
+    resizeCells(xRangeSize > yRangeSize ? xRangeSize:yRangeSize);
+}
+    
+
+void terrain::setPrintModeAut(bool _printAut)
+{
+    printAut = _printAut;
+}
