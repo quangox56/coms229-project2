@@ -126,6 +126,18 @@ istream& terrain::operator>>(istream& in)
     return in;
 }
 
+void terrain::resizeCells(size_t newSize)
+{
+    if(newSize > cells.capacity())
+    {
+        cells.resize(newSize);
+        for(int i = 0; i < cells.size(); i++)
+        {
+            cells[i].resize(newSize);
+        }
+    }
+}
+
 void terrain::handleKeyword(istringstream& iss, string keyword)
 {
     switch(keyword)
@@ -224,6 +236,11 @@ void terrain::handleKeyword(istringstream& iss, string keyword)
                             cerr << "Program is now exiting with error." << endl;
                             exit(1);
                         }
+                        if(x >= cells.capacity() || y >= cells.capacity())
+                        {
+                            resizeCells(x > y ? x : y)//Resize it to the larger
+                                                      //of the two
+                        }
                         cells[y][x] = ALIVE;
                     }
                 }while(comma != ';');
@@ -274,5 +291,7 @@ void terrain::handleKeyword(istringstream& iss, string keyword)
 terrain::terrain()
 {
     isValid = false;
+    //Start out with a 100x100 grid, expand later as needed.
+    resizeCell(100);
 }
 

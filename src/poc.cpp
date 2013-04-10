@@ -19,7 +19,12 @@ int main()
     int y;
     int x;
     vector< vector<cell> > cells;
-    string stringValues = "{\nY = 2 :1;\nY=1:2, 10;Y=10:2,3,4;\n};";
+    cells.resize(100);
+    for(int i = 0; i < cells.size(); i++)
+    {
+        cells[i].resize(100);
+    }
+    string stringValues = "{\nY = 2 :1;\nY=1:2, 10;Y=10:2,3,4;Y=99 :99;};";
     istringstream iss(stringValues);
 
     //Parse the begining of the compound statement
@@ -121,6 +126,7 @@ int main()
     cout << cells[10][3] << endl;
     cout << cells[10][4] << endl;
     cout << cells[5][5] << endl;
+    cout << cells[99][99] << endl;
 
     return 0;
 }
