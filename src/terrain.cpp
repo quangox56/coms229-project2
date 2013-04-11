@@ -2,9 +2,9 @@
 
 using namespace std;
 
-istream& terrain::operator>>(istream& in)
+istream& operator>>(istream& in, terrain& cTerrain)
 {
-    string autFille;
+    string autFile;
 
     string tmp;
     while(in >> tmp)//Put the entire aut file into a string
@@ -21,7 +21,7 @@ istream& terrain::operator>>(istream& in)
     }
 
     //This string will hold each line. This is necessary to simplify comments.
-    string* autFileLines = malloc(sizeof(string)*lineCount);
+    string* autFileLines = (string*)malloc(sizeof(string)*lineCount);
 
     int index = 0;
     unsigned lastFound = 0;
@@ -44,6 +44,9 @@ istream& terrain::operator>>(istream& in)
         if(found != string::npos)
         {
             autFileLines[i] = autFileLines[i].substr(0, found);
+            autFileLines[i] += " ";//This is necessary because a comment
+                                   //can count as whitespace because of the
+                                   //newline.
         }
         found = 0;
         while(found = autFileLines[i].find(";", found) != string::npos)
@@ -85,7 +88,7 @@ istream& terrain::operator>>(istream& in)
     //purpose of removing all comments.
 
     //use an istringstream to parse the statements with whitespace delimiting
-    istringstream iss = new istringstream(autFileStatements[0]);
+    istringstream* iss = new istringstream(autFileStatements[0]);
     string keywords[NUM_KEYWORDS] = KEYWORDS;
     bool keywordsFound[NUM_KEYWORDS];
     for(int i = 0; i < semicolonCount; i++)
@@ -104,7 +107,7 @@ istream& terrain::operator>>(istream& in)
         if(keywordFound)
         {
             //If a keyword was found then call the helper function
-            handleKeyword(iss, keyword);
+            cTerrain.handleKeyword(iss, keyword);
         }
         delete iss;
         istringstream iss = new istringstream(autFileStatements[i+1]);
@@ -126,24 +129,25 @@ istream& terrain::operator>>(istream& in)
     return in;
 }
 
-ostream& terrain::operator<<(ostream& out)
+ostream& operator<<(ostream& out, terrain& cTerrain)
 {
     if(printAut)
     {
-        out << "Xrange " << xRangeLow << " " << xRangeHigh;
-        out << "Yrange " << yRangeLow << " " << yRangeHigh;
+        out << "Xrange " << cTerrain.xRangeLow << " " << cTerrain.xRangeHigh;
+        out << "Yrange " << cTerrain.yRangeLow << " " << cTerrain.yRangeHigh;
         out << "Initial {" << endl;
-
+        
+        //TODO: finish this
             
 
     }
     else
     {
-        for(int y = yRangeLow; y < yRangeHigh; y++)
+        for(int y = cTerrain.yRangeLow; y < cTerrain.yRangeHigh; y++)
         {
-            for(int x = xRangeLow; x < xRangeLow; x++)
+            for(int x = cTerrain.xRangeLow; x < cTerrain.xRangeLow; x++)
             {
-                out << cells[y][x] ? "1":"~";
+                out << cTerrain.cells[y][x] ? "1":"~";
             }
             out << endl;
         }
@@ -371,10 +375,63 @@ void terrain::setPrintModeAut(bool _printAut)
 
 void terrain::simulate(int cycles)
 {
-
+    while(cyles > 0)
+    {
+        for(int y = yRangeLow; y <= yRangeHigh; y++)
+        {
+            for(int x = xRangeLow; x <= xRangeHigh; x++)
+            {
+                cells[y][x] = getNextState(x,y);
+            }
+        }
+        cyles--;
+    }
 }
 
 int terrain::numberOfLiveNeighbors(int x, int y)
 {
+    int liveNeighbors = 0;
+    for(int i = y-1; i <= y+1; i++)
+    {
+        for(int j = x-1; j <= x+1; j++)
+        {
+            //The cell can't be it's own neighbor
+            if(i != y && x != j)
+            {
+                liveNeighbors += cells[i-yRangeLow][j-xRangeLow];
+            }
+        }
+    }
 
+    return liveNeighbors;
+}
+
+cell terrain::getNextState(int x, int y)
+{
+    liveNeighbors = numberOfLiveNeighbors(x, y);
+
+    cell returnState;
+
+    if(cell[y-yRangeLow][x-xRangeLow] == ALIVE)
+    {
+        if(liveNeighbors == 2 || liveNeighbors == 3)
+        {
+            returnState = ALIVE;
+        }
+        else
+        {
+            returnState = DEAD;
+        }
+    }
+    else//Cell is dead
+    {
+        if(liveNeighbors == 3)
+        {
+            returnState = ALIVE;
+        }
+        else
+        {
+            returnState = DEAD;
+        }
+    }
 }

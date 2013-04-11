@@ -9,6 +9,7 @@
 #include"common.h"
 
 
+using namespace std;
 
 class terrain
 {
@@ -33,6 +34,7 @@ class terrain
     void resizeCells(size_t newSize);
 
     int numberOfLiveNeighbors(int x, int y);
+    cell getNextState(int x, int y);
     public:
     //public member functions
     terrain();
@@ -40,11 +42,12 @@ class terrain
     void setXRange(range_t xRange);
     void setPrintModeAut(bool _printAut);
     void simulate(int cycles);
-    istream& operator>>(istream& in);
-    ostream& operator<<(ostream& out);
+    
+    friend istream& operator>>(istream& in, terrain& cTerrain);
+    friend ostream& operator<<(ostream& out, terrain& cTerrain);
 
 
     
 
-}
+};
 #endif

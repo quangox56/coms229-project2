@@ -4,34 +4,36 @@
 #include <fstream>
 #include <string>
 #include <cstdlib>
+#include <iterator>
 #include"terrain.h"
 #include"common.h"
 
+using namespace std;
 
-bool optionExists(char** start, char** end, char* option)
+bool optionExists(vector<string> argStrings, string option)
 {
-    return string::find(start, end, option) != end;
+    return find(argStrings.begin(), argStrings.end(), option) != argStrings.end();
 }
 
-range_t getRange(char** start, char** end, char* option)
+range_t getRange(vector<string> argStrings, string option)
 {
-    char* it = string::find(start, end, option);
+    vector<string>::iterator it = find(argStrings.begin(), argStrings.end(), option);
 
     range_t retRange;
     char comma;
 
-    istringstream iss(it+1);//The object after the iterator should be the option args
+    istringstream iss(*(it+1));//The object after the iterator should be the option args
 
     if(!(iss >> retRange.low) || !(iss >> comma) || !(iss >> retRange.high))
     {
-        cerr >> it+1 >> "is not a valid parameter for" >> option >> endl;
+        cerr << *(it+1) << "is not a valid parameter for" << option << endl;
         exit(1);
     }
     else
     {
         if(comma != ',')
         {
-            cerr >> it+1 >> "is not a valid parameter for" >> option >> endl;
+            cerr << *(it+1) << "is not a valid parameter for" << option << endl;
             exit(1);
         }
     }
@@ -39,13 +41,13 @@ range_t getRange(char** start, char** end, char* option)
     return retRange;
 }
 
-char* getInputFileName(char** start, char** end)
+string getInputFileName(vector<string> argStrings)
 {
     bool hadSwitchBefore = false;
     bool foundInputFile = false;
-    char* returnFileName = NULL;
+    string returnFileName;
 
-    for(char** it = start; it != end; it++)
+    for(vector<string>::iterator it = argStrings.begin(); it != argStrings.end(); it++)
     {
         if((*it)[0] = '-')
         {
@@ -70,13 +72,20 @@ char* getInputFileName(char** start, char** end)
 
 int main(int argc, char** argv)
 {
-    bool hFlag = optionExists(argv, argv+argc, "-h");
-    bool gFlag = optionExists(argv, argv+argc, "-g");    
-    bool aFlag = optionExists(argv, argv+argc, "-a");
-    bool txFlag = optionExists(argv, argv+argc, "-tx");
-    bool tyFlag = optionExists(argv, argv+argc, "-ty");
-    bool wxFlag = optionExists(argv, argv+argc, "-wx");
-    bool wyFlag = optionExists(argv, argv+argc, "-wy");
+    vector<string> argvString(argc);
+
+    for(int i = 0; i < argc; i++)
+    {
+        argvString.push_back(argv[i]);
+    }
+
+    bool hFlag = optionExists(argvString, "-h");
+    bool gFlag = optionExists(argvString, "-g");    
+    bool aFlag = optionExists(argvString, "-a");
+    bool txFlag = optionExists(argvString, "-tx");
+    bool tyFlag = optionExists(argvString, "-ty");
+    bool wxFlag = optionExists(argvString, "-wx");
+    bool wyFlag = optionExists(argvString, "-wy");
 
     int generations = 0;
     range_t txRange;
@@ -87,17 +96,17 @@ int main(int argc, char** argv)
     if(hFlag)
     {
         //TODO: PRINT HELP TEXT
-        cout >> "help flag" >> endl;
+        cout << "help flag" << endl;
         exit(0);
     }
     if(gFlag)
     {
-        char* it = string::find(argv, argv+argc, "-g");
-        istringstream iss(it+1);
+        vector<string>::iterator it = find(argvString.begin(), argvString.end(), "-g");
+        istringstream iss(*(it+1));
 
         if(!(iss >> generations))
         {
-            cerr >> it+1 >> "is not a valid parameter for -g" >> endl;
+            cerr << *(it+1) << "is not a valid parameter for -g" << endl;
             exit(1);
         }
     }
@@ -106,21 +115,21 @@ int main(int argc, char** argv)
 
     if(txFlag)
     {
-        txRange = getRange(argv,argv+argc,"-tx");
+        txRange = getRange(argvString,"-tx");
         terra.setXRange(txRange);
     }
     if(tyFlag)
     {
-        tyRange = getRange(argv,argv+argc,"-ty");
+        tyRange = getRange(argvString,"-ty");
         terra.setYRange(tyRange);
     }
     if(wxFlag)
     {
-        wxRange = getRange(argv,argv+argc,"-wx");
+        wxRange = getRange(argvString,"-wx");
     }
     if(wyFlag)
     {
-        wyRange = getRange(argv,argv+argc,"-wy");
+        wyRange = getRange(argvString,"-wy");
     }
 
     if(aFlag)
@@ -128,59 +137,21 @@ int main(int argc, char** argv)
         terra.setPrintModeAut(true);
     }
 
-    char* filename = getInputFileName(argv, argv+argc);
+    string filename = getInputFileName(argvString);
 
-    ifstream inputFile;
-    istream input;
-    if(filename)
+    if(filename.size() != 0)
     {
-        inputFile.open(filename);
-        input = inputFile;
+        ifstream inputFile;
+        inputFile.open(filename.c_str());
+        inputFile >> terra;
+        inputFile.close();
     }
     else
     {
-        input = cin;
+        cin >> terra;
     }
     
-
-    input >> terra;
     terra.simulate(generations);
     cout << terra;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
