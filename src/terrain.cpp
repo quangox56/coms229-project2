@@ -132,8 +132,10 @@ ostream& terrain::operator<<(ostream& out)
     {
         out << "Xrange " << xRangeLow << " " << xRangeHigh;
         out << "Yrange " << yRangeLow << " " << yRangeHigh;
-        out << "Initia {" << endl;
+        out << "Initial {" << endl;
+
             
+
     }
     else
     {
@@ -166,33 +168,39 @@ void terrain::handleKeyword(istringstream& iss, string keyword)
     switch(keyword)
     {
         case "Xrange":
-            char semicolon;
-            if((!(iss >> xRangeLow) || !(iss >> xRangeHigh) || !(iss >> semicolon)))
+            if(!xRangeSet)//If the xRange has already been set, overrule the .aut
             {
-                cerr << "There was an error in the xRange statement." << endl;
-                cerr << "Program is now exiting with error." << endl;
-                exit(1);
-            }
-            if(semicolon != ';')
-            {
-                cerr << "There was an error in the xRange statement." << endl;
-                cerr << "Program is now exiting with error." << endl;
-                exit(1);
+                char semicolon;
+                if((!(iss >> xRangeLow) || !(iss >> xRangeHigh) || !(iss >> semicolon)))
+                {
+                    cerr << "There was an error in the xRange statement." << endl;
+                    cerr << "Program is now exiting with error." << endl;
+                    exit(1);
+                }
+                if(semicolon != ';')
+                {
+                    cerr << "There was an error in the xRange statement." << endl;
+                    cerr << "Program is now exiting with error." << endl;
+                    exit(1);
+                }
             }
             break;
         case "Yrange":
-            char semicolon;
-            if((!(iss >> yRangeLow) || !(iss >> yRangeHigh) || !(iss >> semicolon)))
+            if(!yRangeSet)//If the yRange has already been set, overrule the .aut
             {
-                cerr << "There was an error in the yRange statement." << endl;
-                cerr << "Program is now exiting with error." << endl;
-                exit(1);
-            }
-            if(semicolon != ';')
-            {
-                cerr << "There was an error in the yRange statement." << endl;
-                cerr << "Program is now exiting with error." << endl;
-                exit(1);
+                char semicolon;
+                if((!(iss >> yRangeLow) || !(iss >> yRangeHigh) || !(iss >> semicolon)))
+                {
+                    cerr << "There was an error in the yRange statement." << endl;
+                    cerr << "Program is now exiting with error." << endl;
+                    exit(1);
+                }
+                if(semicolon != ';')
+                {
+                    cerr << "There was an error in the yRange statement." << endl;
+                    cerr << "Program is now exiting with error." << endl;
+                    exit(1);
+                }
             }
             break;
         case "Initial":
@@ -206,6 +214,11 @@ void terrain::handleKeyword(istringstream& iss, string keyword)
             int y;
             int x;
 
+            int xSize = xRangeHigh-xRangeLow;
+            int ySize = yRangeHigh-yRangeLow;
+            resizeCells(xSize > ySize ? xSize+2:ySize+2);//Size the vectors
+                                                     //to the largest of the two.
+            
             //Parse the begining of the compound statement
             if((!(iss >> leftBracket)))
             {
@@ -222,6 +235,26 @@ void terrain::handleKeyword(istringstream& iss, string keyword)
                     exit(1);
                 }
             }
+
+            if(!(iss >> rightBracket))
+            {
+                cerr << "There was an error in the Initial statement." << endl;
+                cerr << "Program is now exiting with error." << endl;
+                exit(1);
+            }
+            else
+            {
+                if(rightBracket == '}')
+                {//if we pulled a right bracket off, it's an empty initial statement.
+                    break;
+                }
+                else
+                {//Else put whatever we took out of the stream back.
+                    iss.unget();
+                }
+
+            }
+
 
             while(1)
             {
@@ -259,12 +292,12 @@ void terrain::handleKeyword(istringstream& iss, string keyword)
                             cerr << "Program is now exiting with error." << endl;
                             exit(1);
                         }
-                        if(x >= cells.capacity() || y >= cells.capacity())
+
+                        if(y >=yRangeLow && y <= yRangeHigh &&
+                           x >=xRangeLow && x <= xRangeHigh)
                         {
-                            resizeCells(x > y ? x : y);//Resize it to the larger
-                                                      //of the two
+                            cells[y-yRangeLow][x-xRangeLow] = ALIVE;
                         }
-                        cells[y][x] = ALIVE;
                     }
                 }while(comma != ';');
 
@@ -310,34 +343,38 @@ void terrain::handleKeyword(istringstream& iss, string keyword)
 
 }
 
-
 terrain::terrain()
 {
     isValid = false;
     printAut = false;
     rangesSet = false;
-    //Start out with a 100x100 grid, expand later as needed.
-    resizeCell(100);
-}
-
-terrain::terrain(range_t xRange, range_t yRange)
-{
-    isValid = false;
-    printAut = false;
-    xRangeLow = xRange.low;
-    xRangeHigh = xRange.high;
-    yRangeLow = yRange.low;
-    yRangeHigh = yRange.high;
-    rangesSet = true;
-
-    int xRangeSize = xRangeHigh - xRangeLow;
-    int yRangeSize = yRangeHigh - yRangeLow;
-
-    resizeCells(xRangeSize > yRangeSize ? xRangeSize:yRangeSize);
 }
     
+void terrain::setYRange(range_t yRange)
+{
+    yRangeLow = yRange.low;
+    yRangeHigh = yRange.high;
+    yRangeSet = true;
+}
+
+void terrain::setXRange(range_t xRange)
+{
+    xRangeLow = xRange.low;
+    xRangeHigh = xRange.high;
+    xRangeSet = true;
+}
 
 void terrain::setPrintModeAut(bool _printAut)
 {
     printAut = _printAut;
+}
+
+void terrain::simulate(int cycles)
+{
+
+}
+
+int terrain::numberOfLiveNeighbors(int x, int y)
+{
+
 }

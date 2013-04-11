@@ -1,5 +1,7 @@
 #include <algorithm>
+#include <iostream>
 #include <sstream>
+#include <fstream>
 #include <string>
 #include <cstdlib>
 #include"terrain.h"
@@ -37,6 +39,34 @@ range_t getRange(char** start, char** end, char* option)
     return retRange;
 }
 
+char* getInputFileName(char** start, char** end)
+{
+    bool hadSwitchBefore = false;
+    bool foundInputFile = false;
+    char* returnFileName = NULL;
+
+    for(char** it = start; it != end; it++)
+    {
+        if((*it)[0] = '-')
+        {
+            hadSwitchBefore = true;
+            continue;
+        }
+        else
+        {
+            hadSwitchBefore = false;
+        }
+
+        if(!hadSwitchBefore)
+        {
+            returnFileName = *it;
+            break;
+        }
+    }
+    
+    return returnFileName;
+
+}
 
 int main(int argc, char** argv)
 {
@@ -71,13 +101,18 @@ int main(int argc, char** argv)
             exit(1);
         }
     }
+
+    terrain terra;//terra is latin for earth :)
+
     if(txFlag)
     {
         txRange = getRange(argv,argv+argc,"-tx");
+        terra.setXRange(txRange);
     }
     if(tyFlag)
     {
         tyRange = getRange(argv,argv+argc,"-ty");
+        terra.setYRange(tyRange);
     }
     if(wxFlag)
     {
@@ -88,10 +123,29 @@ int main(int argc, char** argv)
         wyRange = getRange(argv,argv+argc,"-wy");
     }
 
+    if(aFlag)
+    {
+        terra.setPrintModeAut(true);
+    }
 
+    char* filename = getInputFileName(argv, argv+argc);
 
+    ifstream inputFile;
+    istream input;
+    if(filename)
+    {
+        inputFile.open(filename);
+        input = inputFile;
+    }
+    else
+    {
+        input = cin;
+    }
+    
 
-
+    input >> terra;
+    terra.simulate(generations);
+    cout << terra;
 }
 
 

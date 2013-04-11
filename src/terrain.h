@@ -19,7 +19,8 @@ class terrain
     int xRangeHigh;
     int yRangeLow;
     int yRangeHigh;
-    bool rangesSet;
+    bool xRangeSet;
+    bool yRangeSet;
     bool isValid;
     bool printAut;
 
@@ -31,12 +32,14 @@ class terrain
 
     void resizeCells(size_t newSize);
 
+    int numberOfLiveNeighbors(int x, int y);
     public:
     //public member functions
     terrain();
-    terrain(range_t xRange, range_t yRange);
-    void setRange(range_t xRange, range_t yRange);
+    void setYRange(range_t yRange);
+    void setXRange(range_t xRange);
     void setPrintModeAut(bool _printAut);
+    void simulate(int cycles);
     istream& operator>>(istream& in);
     ostream& operator<<(ostream& out);
 
