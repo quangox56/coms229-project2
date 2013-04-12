@@ -7,33 +7,36 @@ istream& operator>>(istream& in, terrain& cTerrain)
     string autFile;
 
     string tmp;
-    while(in >> tmp)//Put the entire aut file into a string
+    while(getline(in, tmp))//Put the entire aut file into a string
     {
-        autFile += tmp;
+        autFile += tmp + "\n";
     }
 
-    int lineCount = 1;//The file obviously starts with one line
+    int lineCount = 0;
     size_t found = 0;
     //count the number of lines
-    while(found = autFile.find("\n", found) != string::npos)
+    while((found = autFile.find("\n", found)) != string::npos)
     {
         lineCount++;
+        found++;
     }
 
+
     //This string will hold each line. This is necessary to simplify comments.
-    string* autFileLines = (string*)malloc(sizeof(string)*lineCount);
+    string* autFileLines = new string[lineCount];
 
     int index = 0;
-    unsigned lastFound = 0;
+    size_t lastFound = 0;
     found = 0;
     //Split the file into lines.
-    while(found = autFile.find("\n", found) != string::npos)
+    while((found = autFile.find("\n", found)) != string::npos)
     {
-        autFileLines[index] = autFile.substr(lastFound, found-lastFound);
+        autFileLines[index] = autFile.substr(lastFound, found-lastFound+1);
+        found++;
         lastFound = found;
         index++;
     }
-    autFileLines[index] = autFile.substr(lastFound);
+    //autFileLines[index] = autFile.substr(lastFound);
 
     int semicolonCount = 0;
     found = 0;
@@ -50,16 +53,17 @@ istream& operator>>(istream& in, terrain& cTerrain)
                                    //newline.
         }
         found = 0;
-        while(found = autFileLines[i].find(";", found) != string::npos)
+        while((found = autFileLines[i].find(";", found)) != string::npos)
         {
             semicolonCount++;
+            found++;
         }
     }
 
     //This variable will be an array of all the statements in the file.
     //Statements are delimited by semicolons. All Comments have been removed
     //by this point.
-    string* autFileStatements = (string*)malloc(sizeof(string)*semicolonCount);
+    string* autFileStatements = new string[semicolonCount];
     index = 0;
     //Divide the lines into statements delimited by semicolons
     for(int i = 0; i < lineCount; i++)
@@ -69,23 +73,25 @@ istream& operator>>(istream& in, terrain& cTerrain)
         found = autFileLines[i].find(";");
         if(found != string::npos)
         {
-            autFileStatements[index] = autFileLines[i].substr(lastFound, found);
+            autFileStatements[index] = autFileLines[i].substr(lastFound, found+1);
+            found++;
             lastFound = found;
             index++;
-            while(found = autFileLines[i].find(";", found) != string::npos)
+            while((found = autFileLines[i].find(";", found)) != string::npos)
             {
                 autFileStatements[index] += autFileLines[i].substr(lastFound, found);
                 index++;
+                found++;
                 lastFound = found;
             }
-            autFileStatements[index] += autFileLines[i].substr(lastFound);
+            //autFileStatements[index] += autFileLines[i].substr(lastFound);
         } 
         else//there was no semicolon, add the entire line to the statement.
         {
             autFileStatements[index] += autFileLines[i];
         }
     }
-    free(autFileLines);//No longer need the lines. They have served their
+    delete[] autFileLines;//No longer need the lines. They have served their
     //purpose of removing all comments.
 
     //use an istringstream to parse the statements with whitespace delimiting
@@ -97,7 +103,7 @@ istream& operator>>(istream& in, terrain& cTerrain)
         string tmp;
         bool keywordFound = false;
         (*iss) >> tmp;
-        for(int j = 0; j < NUM_KEYWORDS; i++)
+        for(int j = 0; j < NUM_KEYWORDS; j++)
         {
             if(tmp == keywords[j])
             {
@@ -111,9 +117,12 @@ istream& operator>>(istream& in, terrain& cTerrain)
             cTerrain.handleKeyword(*iss, tmp);
         }
         delete iss;
-        iss = new istringstream(autFileStatements[i+1]);
+        if((i+1) < semicolonCount)
+        {
+            iss = new istringstream(autFileStatements[i+1]);
+        }
     }
-    delete iss;
+    delete[] autFileStatements;
 
     //Check that all required keywords were found.
     for(int i = 0; i < NUM_KEYWORDS; i++)
