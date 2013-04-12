@@ -13,7 +13,7 @@ istream& operator>>(istream& in, terrain& cTerrain)
     }
 
     int lineCount = 1;//The file obviously starts with one line
-    unsigned found = 0;
+    size_t found = 0;
     //count the number of lines
     while(found = autFile.find("\n", found) != string::npos)
     {
@@ -36,6 +36,7 @@ istream& operator>>(istream& in, terrain& cTerrain)
     autFileLines[index] = autFile.substr(lastFound);
 
     int semicolonCount = 0;
+    found = 0;
     //Find comment symbol # and remove all comments.
     //Also count all semicolons while looping through all the lines.
     for(int i = 0; i < lineCount; i++)
@@ -95,7 +96,7 @@ istream& operator>>(istream& in, terrain& cTerrain)
     {
         string tmp;
         bool keywordFound = false;
-        iss >> tmp;
+        (*iss) >> tmp;
         for(int j = 0; j < NUM_KEYWORDS; i++)
         {
             if(tmp == keywords[j])
@@ -107,10 +108,10 @@ istream& operator>>(istream& in, terrain& cTerrain)
         if(keywordFound)
         {
             //If a keyword was found then call the helper function
-            cTerrain.handleKeyword(iss, keyword);
+            cTerrain.handleKeyword(*iss, tmp);
         }
         delete iss;
-        istringstream iss = new istringstream(autFileStatements[i+1]);
+        iss = new istringstream(autFileStatements[i+1]);
     }
     delete iss;
 
@@ -119,19 +120,19 @@ istream& operator>>(istream& in, terrain& cTerrain)
     {
         if(!keywordsFound[i])
         {
-            cerr >> "Error: Not all required keywords found in .aut file." >> endl;
-            cerr >> "Program exiting in error." >> endl;
+            cerr << "Error: Not all required keywords found in .aut file." << endl;
+            cerr << "Program exiting in error." << endl;
             exit(1);
         }
     }
 
-    isValid = true;
+    cTerrain.isValid = true;
     return in;
 }
 
 ostream& operator<<(ostream& out, terrain& cTerrain)
 {
-    if(printAut)
+    if(cTerrain.printAut)
     {
         out << "Xrange " << cTerrain.xRangeLow << " " << cTerrain.xRangeHigh;
         out << "Yrange " << cTerrain.yRangeLow << " " << cTerrain.yRangeHigh;
@@ -169,120 +170,95 @@ void terrain::resizeCells(size_t newSize)
 
 void terrain::handleKeyword(istringstream& iss, string keyword)
 {
-    switch(keyword)
+    if(keyword == "Xrange")
     {
-        case "Xrange":
-            if(!xRangeSet)//If the xRange has already been set, overrule the .aut
-            {
-                char semicolon;
-                if((!(iss >> xRangeLow) || !(iss >> xRangeHigh) || !(iss >> semicolon)))
-                {
-                    cerr << "There was an error in the xRange statement." << endl;
-                    cerr << "Program is now exiting with error." << endl;
-                    exit(1);
-                }
-                if(semicolon != ';')
-                {
-                    cerr << "There was an error in the xRange statement." << endl;
-                    cerr << "Program is now exiting with error." << endl;
-                    exit(1);
-                }
-            }
-            break;
-        case "Yrange":
-            if(!yRangeSet)//If the yRange has already been set, overrule the .aut
-            {
-                char semicolon;
-                if((!(iss >> yRangeLow) || !(iss >> yRangeHigh) || !(iss >> semicolon)))
-                {
-                    cerr << "There was an error in the yRange statement." << endl;
-                    cerr << "Program is now exiting with error." << endl;
-                    exit(1);
-                }
-                if(semicolon != ';')
-                {
-                    cerr << "There was an error in the yRange statement." << endl;
-                    cerr << "Program is now exiting with error." << endl;
-                    exit(1);
-                }
-            }
-            break;
-        case "Initial":
-            char leftBracket;
-            char Y;
-            char equals;
-            char comma;
-            char colon;
-            char rightBracket;
+        if(!xRangeSet)//If the xRange has already been set, overrule the .aut
+        {
             char semicolon;
-            int y;
-            int x;
+            if((!(iss >> xRangeLow) || !(iss >> xRangeHigh) || !(iss >> semicolon)))
+            {
+                cerr << "There was an error in the xRange statement." << endl;
+                cerr << "Program is now exiting with error." << endl;
+                exit(1);
+            }
+            if(semicolon != ';')
+            {
+                cerr << "There was an error in the xRange statement." << endl;
+                cerr << "Program is now exiting with error." << endl;
+                exit(1);
+            }
+        }
+    }
+    else if(keyword == "Yrange")
+    {
+        if(!yRangeSet)//If the yRange has already been set, overrule the .aut
+        {
+            char semicolon;
+            if((!(iss >> yRangeLow) || !(iss >> yRangeHigh) || !(iss >> semicolon)))
+            {
+                cerr << "There was an error in the yRange statement." << endl;
+                cerr << "Program is now exiting with error." << endl;
+                exit(1);
+            }
+            if(semicolon != ';')
+            {
+                cerr << "There was an error in the yRange statement." << endl;
+                cerr << "Program is now exiting with error." << endl;
+                exit(1);
+            }
+        }
+    }
+    else if(keyword == "Initial")
+    {
+        char leftBracket;
+        char Y;
+        char equals;
+        char comma;
+        char colon;
+        char rightBracket;
+        char semicolon;
+        int y;
+        int x;
 
-            int xSize = xRangeHigh-xRangeLow;
-            int ySize = yRangeHigh-yRangeLow;
-            resizeCells(xSize > ySize ? xSize+2:ySize+2);//Size the vectors
-                                                     //to the largest of the two.
-            
-            //Parse the begining of the compound statement
-            if((!(iss >> leftBracket)))
+        int xSize = xRangeHigh-xRangeLow;
+        int ySize = yRangeHigh-yRangeLow;
+        resizeCells(xSize > ySize ? xSize+2:ySize+2);//Size the vectors
+        //to the largest of the two.
+
+        //Parse the begining of the compound statement
+        if((!(iss >> leftBracket)))
+        {
+            cerr << "There was an error in the Initial statement." << endl;
+            cerr << "Program is now exiting with error." << endl;
+            exit(1);
+        }
+        else
+        {
+            if(leftBracket != '{')
             {
                 cerr << "There was an error in the Initial statement." << endl;
                 cerr << "Program is now exiting with error." << endl;
                 exit(1);
             }
-            else
-            {
-                if(leftBracket != '{')
+        }
+
+        if(!(iss >> rightBracket))
+        {
+            cerr << "There was an error in the Initial statement." << endl;
+            cerr << "Program is now exiting with error." << endl;
+            exit(1);
+        }
+        else
+        {
+            if(rightBracket != '}')
+            {//if we pulled a right bracket off, it's an empty initial statement.
+                //Else put whatever we took out of the stream back.
+                //and continue processing.
+                iss.unget();
+                while(1)
                 {
-                    cerr << "There was an error in the Initial statement." << endl;
-                    cerr << "Program is now exiting with error." << endl;
-                    exit(1);
-                }
-            }
-
-            if(!(iss >> rightBracket))
-            {
-                cerr << "There was an error in the Initial statement." << endl;
-                cerr << "Program is now exiting with error." << endl;
-                exit(1);
-            }
-            else
-            {
-                if(rightBracket == '}')
-                {//if we pulled a right bracket off, it's an empty initial statement.
-                    break;
-                }
-                else
-                {//Else put whatever we took out of the stream back.
-                    iss.unget();
-                }
-
-            }
-
-
-            while(1)
-            {
-                //parse the Y value
-                if((!(iss>>Y) || !(iss>>equals) || !(iss>>y) || !(iss>>colon)))
-                {
-                    cerr << "There was an error in the Initial statement." << endl;
-                    cerr << "Program is now exiting with error." << endl;
-                    exit(1);
-                }
-                else
-                {
-                    if(Y != 'Y' || equals != '=' || colon != ':')
-                    {
-                        cerr << "There was an error in the Initial statement." << endl;
-                        cerr << "Program is now exiting with error." << endl;
-                        exit(1);
-                    }
-                }
-
-                //Begin parsing corresponding x-list
-                do
-                {
-                    if(!(iss>>x) || !(iss>>comma))
+                    //parse the Y value
+                    if((!(iss>>Y) || !(iss>>equals) || !(iss>>y) || !(iss>>colon)))
                     {
                         cerr << "There was an error in the Initial statement." << endl;
                         cerr << "Program is now exiting with error." << endl;
@@ -290,22 +266,60 @@ void terrain::handleKeyword(istringstream& iss, string keyword)
                     }
                     else
                     {
-                        if(comma != ',' && comma != ';')
+                        if(Y != 'Y' || equals != '=' || colon != ':')
                         {
                             cerr << "There was an error in the Initial statement." << endl;
                             cerr << "Program is now exiting with error." << endl;
                             exit(1);
                         }
-
-                        if(y >=yRangeLow && y <= yRangeHigh &&
-                           x >=xRangeLow && x <= xRangeHigh)
-                        {
-                            cells[y-yRangeLow][x-xRangeLow] = ALIVE;
-                        }
                     }
-                }while(comma != ';');
 
-                if(!(iss>>rightBracket))
+                    //Begin parsing corresponding x-list
+                    do
+                    {
+                        if(!(iss>>x) || !(iss>>comma))
+                        {
+                            cerr << "There was an error in the Initial statement." << endl;
+                            cerr << "Program is now exiting with error." << endl;
+                            exit(1);
+                        }
+                        else
+                        {
+                            if(comma != ',' && comma != ';')
+                            {
+                                cerr << "There was an error in the Initial statement." << endl;
+                                cerr << "Program is now exiting with error." << endl;
+                                exit(1);
+                            }
+
+                            if(y >=yRangeLow && y <= yRangeHigh &&
+                                    x >=xRangeLow && x <= xRangeHigh)
+                            {
+                                cells[y-yRangeLow][x-xRangeLow] = ALIVE;
+                            }
+                        }
+                    }while(comma != ';');
+
+                    if(!(iss>>rightBracket))
+                    {
+                        cerr << "There was an error in the Initial statement." << endl;
+                        cerr << "Program is now exiting with error." << endl;
+                        exit(1);
+                    }
+                    else
+                    {
+                        if(rightBracket == '}')
+                        {//if we have reached the right bracket then exit the loop
+                            break;
+                        }
+                        else
+                        {//Else put whatever we popped back on for the next loop
+                            iss.unget();
+                        }
+
+                    }
+                }
+                if(!(iss>>semicolon))
                 {
                     cerr << "There was an error in the Initial statement." << endl;
                     cerr << "Program is now exiting with error." << endl;
@@ -313,45 +327,29 @@ void terrain::handleKeyword(istringstream& iss, string keyword)
                 }
                 else
                 {
-                    if(rightBracket == '}')
-                    {//if we have reached the right bracket then exit the loop
-                        break;
+                    if(semicolon != ';')
+                    {
+                        cerr << "There was an error in the Initial statement." << endl;
+                        cerr << "Program is now exiting with error." << endl;
+                        exit(1);
                     }
-                    else
-                    {//Else put whatever we popped back on for the next loop
-                        iss.unget();
-                    }
+                }
+            }
 
-                }
-            }
-            if(!(iss>>semicolon))
-            {
-                cerr << "There was an error in the Initial statement." << endl;
-                cerr << "Program is now exiting with error." << endl;
-                exit(1);
-            }
-            else
-            {
-                if(semicolon != ';')
-                {
-                    cerr << "There was an error in the Initial statement." << endl;
-                    cerr << "Program is now exiting with error." << endl;
-                    exit(1);
-                }
-            }
-            break;
-        default:
-            cerr << "Shouldnt reach here, invalid keyword passed.\n";
-            break;
+        }
     }
-
+    else
+    {
+        cerr << "Shouldnt reach here, invalid keyword passed.\n";
+    }
 }
 
 terrain::terrain()
 {
     isValid = false;
     printAut = false;
-    rangesSet = false;
+    xRangeSet = false;
+    yRangeSet = false;
 }
     
 void terrain::setYRange(range_t yRange)
@@ -375,7 +373,7 @@ void terrain::setPrintModeAut(bool _printAut)
 
 void terrain::simulate(int cycles)
 {
-    while(cyles > 0)
+    while(cycles > 0)
     {
         for(int y = yRangeLow; y <= yRangeHigh; y++)
         {
@@ -384,7 +382,7 @@ void terrain::simulate(int cycles)
                 cells[y][x] = getNextState(x,y);
             }
         }
-        cyles--;
+        cycles--;
     }
 }
 
@@ -408,11 +406,11 @@ int terrain::numberOfLiveNeighbors(int x, int y)
 
 cell terrain::getNextState(int x, int y)
 {
-    liveNeighbors = numberOfLiveNeighbors(x, y);
+    int liveNeighbors = numberOfLiveNeighbors(x, y);
 
     cell returnState;
 
-    if(cell[y-yRangeLow][x-xRangeLow] == ALIVE)
+    if(cells[y-yRangeLow][x-xRangeLow] == ALIVE)
     {
         if(liveNeighbors == 2 || liveNeighbors == 3)
         {

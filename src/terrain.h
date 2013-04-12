@@ -29,7 +29,7 @@ class terrain
 
 
     //private member functions
-    void handleKeyword(istringstream&);
+    void handleKeyword(istringstream&, string keyword);
 
     void resizeCells(size_t newSize);
 

@@ -6,11 +6,11 @@ showgen: showgen.o terrain.o
 
 terrain.o: src/terrain.cpp src/terrain.h src/common.h
 	mkdir -p obj
-	g++ -c src/terrain.cpp src/terrain.h src/common.h -o obj/terrain.o
+	g++ -c -g src/terrain.cpp -o obj/terrain.o
 
 showgen.o: src/showgen.cpp src/common.h
 	mkdir -p obj
-	g++ -c src/showgen.cpp src/common.h -o obj/showgen.o
+	g++ -c -g src/showgen.cpp -o obj/showgen.o
 
 clean:
 	rm -rf obj

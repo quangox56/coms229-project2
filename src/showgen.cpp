@@ -72,9 +72,9 @@ string getInputFileName(vector<string> argStrings)
 
 int main(int argc, char** argv)
 {
-    vector<string> argvString(argc);
+    vector<string> argvString(argc - 1);
 
-    for(int i = 0; i < argc; i++)
+    for(int i = 1; i < argc; i++)
     {
         argvString.push_back(argv[i]);
     }
