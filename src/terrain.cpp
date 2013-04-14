@@ -94,6 +94,22 @@ istream& operator>>(istream& in, terrain& cTerrain)
     delete[] autFileLines;//No longer need the lines. They have served their
     //purpose of removing all comments.
 
+    //Trim any beginning whitespace, this can screw up later parsing.
+    for(int i = 0; i < semicolonCount; i++)
+    {
+        int j = 0;
+        while(autFileStatements[i][j] == ' ' || 
+              autFileStatements[i][j] == '\n' || 
+              autFileStatements[i][j] == '\t' || 
+              autFileStatements[i][j] == '\v' || 
+              autFileStatements[i][j] == '\r' || 
+              autFileStatements[i][j] == '\f')
+        {
+            autFileStatements[i] = autFileStatements[i].substr(1);
+        }
+    }
+
+    
     //use an istringstream to parse the statements with whitespace delimiting
     istringstream* iss = new istringstream(autFileStatements[0]);
     string keywords[NUM_KEYWORDS] = KEYWORDS;
