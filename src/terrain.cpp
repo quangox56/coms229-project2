@@ -73,13 +73,13 @@ istream& operator>>(istream& in, terrain& cTerrain)
         found = autFileLines[i].find(";");
         if(found != string::npos)
         {
-            autFileStatements[index] = autFileLines[i].substr(lastFound, found+1);
+            autFileStatements[index] += autFileLines[i].substr(lastFound, found-lastFound+1);
             found++;
             lastFound = found;
             index++;
             while((found = autFileLines[i].find(";", found)) != string::npos)
             {
-                autFileStatements[index] += autFileLines[i].substr(lastFound, found);
+                autFileStatements[index] += autFileLines[i].substr(lastFound, found-lastFound+1);
                 index++;
                 found++;
                 lastFound = found;
@@ -105,10 +105,41 @@ istream& operator>>(istream& in, terrain& cTerrain)
         (*iss) >> tmp;
         for(int j = 0; j < NUM_KEYWORDS; j++)
         {
-            if(tmp == keywords[j])
+            found = 0;
+            if((found = tmp.find(keywords[j])) != string::npos)
             {
-                keywordFound = true;
-                keywordsFound[j] = true;
+                if(found == 0)//Keyword must be at the start of the statement
+                {
+                    if(keywords[j] == "Initial")
+                    {
+                        delete iss;
+                        i++;
+                        string cmpdStatement = autFileStatements[i-1] + autFileStatements[i];
+                        while(autFileStatements[i].find("}") == string::npos)
+                        {
+                            if(i < semicolonCount)
+                            {
+                                cmpdStatement += autFileStatements[i];
+                                i++;
+                            }
+                            else
+                            {
+                                break;
+                            }
+                        }
+                        if(i < semicolonCount)
+                        {
+                            cmpdStatement += autFileStatements[i];
+                        }
+
+                        //Remove the keyword from the string.
+                        cmpdStatement = cmpdStatement.substr(keywords[j].length());
+                        tmp = "Initial";
+                        iss = new istringstream(cmpdStatement);
+                    }
+                    keywordFound = true;
+                    keywordsFound[j] = true;
+                }
             }
         }
         if(keywordFound)
@@ -143,21 +174,41 @@ ostream& operator<<(ostream& out, terrain& cTerrain)
 {
     if(cTerrain.printAut)
     {
-        out << "Xrange " << cTerrain.xRangeLow << " " << cTerrain.xRangeHigh;
-        out << "Yrange " << cTerrain.yRangeLow << " " << cTerrain.yRangeHigh;
+        out << "Xrange " << cTerrain.xRangeLow << " " << cTerrain.xRangeHigh << ";" << endl;
+        out << "Yrange " << cTerrain.yRangeLow << " " << cTerrain.yRangeHigh << ";" << endl;
         out << "Initial {" << endl;
-        
-        //TODO: finish this
-            
+
+        for(int y = cTerrain.yRangeLow; y <= cTerrain.yRangeHigh; y++)
+        {
+            out << "Y = " << y << " : ";
+            bool firstX = true;
+            for(int x = cTerrain.xRangeLow; x <= cTerrain.xRangeHigh; x++)
+            {
+                if(cTerrain.cells[y][x] == ALIVE)
+                {
+                    if(firstX)
+                    {
+                        out << x;
+                        firstX = false;
+                    }
+                    else
+                    {
+                        out << "," << x;
+                    }
+                }
+            }
+            out << ";" << endl;
+        }
+        out << "};" << endl;
 
     }
     else
     {
-        for(int y = cTerrain.yRangeLow; y < cTerrain.yRangeHigh; y++)
+        for(int y = cTerrain.yRangeLow; y <= cTerrain.yRangeHigh; y++)
         {
-            for(int x = cTerrain.xRangeLow; x < cTerrain.xRangeLow; x++)
+            for(int x = cTerrain.xRangeLow; x <= cTerrain.xRangeHigh; x++)
             {
-                out << cTerrain.cells[y][x] ? "1":"~";
+                out << (cTerrain.cells[y][x] ? "1":"~");
             }
             out << endl;
         }

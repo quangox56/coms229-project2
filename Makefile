@@ -15,4 +15,4 @@ showgen.o: src/showgen.cpp src/common.h
 clean:
 	rm -rf obj
 	rm -rf bin
-	rm core.*
+	rm -f core.*
