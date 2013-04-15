@@ -20,8 +20,15 @@ class terrain
     int xRangeHigh;
     int yRangeLow;
     int yRangeHigh;
+    int wxRangeLow;
+    int wxRangeHigh;
+    int wyRangeLow;
+    int wyRangeHigh;
+
     bool xRangeSet;
     bool yRangeSet;
+    bool wxRangeSet;
+    bool wyRangeSet;
     bool isValid;
     bool printAut;
 
@@ -40,6 +47,8 @@ class terrain
     terrain();
     void setYRange(range_t yRange);
     void setXRange(range_t xRange);
+    void setWYRange(range_t wyRange);
+    void setWXRange(range_t wxRange);
     void setPrintModeAut(bool _printAut);
     void simulate(int cycles);
     

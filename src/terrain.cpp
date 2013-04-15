@@ -2,7 +2,7 @@
 
 using namespace std;
 
-istream& operator>>(istream& in, terrain& cTerrain)
+istream& operator>>(istream& in, terrain& cT)
 {
     string autFile;
 
@@ -161,7 +161,7 @@ istream& operator>>(istream& in, terrain& cTerrain)
         if(keywordFound)
         {
             //If a keyword was found then call the helper function
-            cTerrain.handleKeyword(*iss, tmp);
+            cT.handleKeyword(*iss, tmp);
         }
         delete iss;
         if((i+1) < semicolonCount)
@@ -182,34 +182,53 @@ istream& operator>>(istream& in, terrain& cTerrain)
         }
     }
 
-    cTerrain.isValid = true;
+    cT.isValid = true;
     return in;
 }
 
-ostream& operator<<(ostream& out, terrain& cTerrain)
+ostream& operator<<(ostream& out, terrain& cT)
 {
-    if(cTerrain.printAut)
+    if(!cT.wxRangeSet)
     {
-        out << "Xrange " << cTerrain.xRangeLow << " " << cTerrain.xRangeHigh << ";" << endl;
-        out << "Yrange " << cTerrain.yRangeLow << " " << cTerrain.yRangeHigh << ";" << endl;
+        cT.wxRangeLow = cT.xRangeLow;
+        cT.wxRangeHigh = cT.xRangeHigh;
+    }
+    if(!cT.wyRangeSet)
+    {
+        cT.wyRangeLow = cT.yRangeLow;
+        cT.wyRangeHigh = cT.yRangeHigh;
+    }
+
+    if(cT.printAut)
+    {
+        out << "Xrange " << cT.wxRangeLow << " " << cT.wxRangeHigh << ";" << endl;
+        out << "Yrange " << cT.wyRangeLow << " " << cT.wyRangeHigh << ";" << endl;
         out << "Initial {" << endl;
 
-        for(int y = cTerrain.yRangeLow; y <= cTerrain.yRangeHigh; y++)
+        for(int y = (cT.wyRangeLow - cT.yRangeLow) + (cT.wyRangeHigh - cT.wyRangeLow); 
+            y >= cT.wyRangeLow - cT.yRangeLow;
+            y--)
         {
             out << "Y = " << y << " : ";
             bool firstX = true;
-            for(int x = cTerrain.xRangeLow; x <= cTerrain.xRangeHigh; x++)
+            for(int x = cT.wxRangeLow - cT.xRangeLow; 
+                    x <= (cT.wxRangeLow - cT.xRangeLow) + (cT.wxRangeHigh - cT.wxRangeLow);
+                    x++)
             {
-                if(cTerrain.cells[y][x] == ALIVE)
+                if(0 <= y && y <= cT.yRangeHigh-cT.yRangeLow &&
+                   0 <= x && x <= cT.xRangeHigh-cT.xRangeLow)
                 {
-                    if(firstX)
+                    if(cT.cells[y][x] == ALIVE)
                     {
-                        out << x;
-                        firstX = false;
-                    }
-                    else
-                    {
-                        out << "," << x;
+                        if(firstX)
+                        {
+                            out << x;
+                            firstX = false;
+                        }
+                        else
+                        {
+                            out << "," << x;
+                        }
                     }
                 }
             }
@@ -220,11 +239,24 @@ ostream& operator<<(ostream& out, terrain& cTerrain)
     }
     else
     {
-        for(int y = cTerrain.yRangeLow; y <= cTerrain.yRangeHigh; y++)
+        for(int y = (cT.wyRangeLow - cT.yRangeLow) + (cT.wyRangeHigh - cT.wyRangeLow); 
+            y >= cT.wyRangeLow - cT.yRangeLow;
+            y--)
         {
-            for(int x = cTerrain.xRangeLow; x <= cTerrain.xRangeHigh; x++)
+            for(int x = cT.wxRangeLow - cT.xRangeLow; 
+                    x <= (cT.wxRangeLow - cT.xRangeLow) + (cT.wxRangeHigh - cT.wxRangeLow);
+                    x++)
             {
-                out << (cTerrain.cells[y][x] ? "1":"~");
+
+                if(0 <= y && y <= cT.yRangeHigh-cT.yRangeLow &&
+                   0 <= x && x <= cT.xRangeHigh-cT.xRangeLow)
+                {
+                    out << (cT.cells[y][x] ? "1":"~");
+                }
+                else
+                {
+                    out << "~";
+                }
             }
             out << endl;
         }
@@ -426,6 +458,8 @@ terrain::terrain()
     printAut = false;
     xRangeSet = false;
     yRangeSet = false;
+    wxRangeSet = false;
+    wyRangeSet = false;
 }
     
 void terrain::setYRange(range_t yRange)
@@ -442,6 +476,20 @@ void terrain::setXRange(range_t xRange)
     xRangeSet = true;
 }
 
+void terrain::setWYRange(range_t wyRange)
+{
+    wyRangeLow = wyRange.low;
+    wyRangeHigh = wyRange.high;
+    wyRangeSet = true;
+}
+
+void terrain::setWXRange(range_t wxRange)
+{
+    wxRangeLow = wxRange.low;
+    wxRangeHigh = wxRange.high;
+    wxRangeSet = true;
+}
+
 void terrain::setPrintModeAut(bool _printAut)
 {
     printAut = _printAut;
@@ -451,14 +499,16 @@ void terrain::simulate(int cycles)
 {
     while(cycles > 0)
     {
-        for(int y = yRangeLow; y <= yRangeHigh; y++)
+        vector< vector<cell> > tmpCells(cells);
+        for(int y = 0; y <= yRangeHigh-yRangeLow; y++)
         {
-            for(int x = xRangeLow; x <= xRangeHigh; x++)
+            for(int x = 0; x <= xRangeHigh-xRangeLow; x++)
             {
-                cells[y][x] = getNextState(x,y);
+                tmpCells[y-yRangeLow][x-xRangeLow] = getNextState(x-xRangeLow,y-yRangeLow);
             }
         }
         cycles--;
+        cells.assign(tmpCells.begin(), tmpCells.end());
     }
 }
 
@@ -469,10 +519,14 @@ int terrain::numberOfLiveNeighbors(int x, int y)
     {
         for(int j = x-1; j <= x+1; j++)
         {
-            //The cell can't be it's own neighbor
-            if(i != y && x != j)
+            if(0 <= i && i <= yRangeHigh-yRangeLow &&
+               0 <= j && j <= xRangeHigh-xRangeLow)
             {
-                liveNeighbors += cells[i-yRangeLow][j-xRangeLow];
+                //The cell can't be it's own neighbor
+                if(i != y && x != j)
+                {
+                    liveNeighbors += cells[i][j];
+                }
             }
         }
     }
@@ -486,7 +540,7 @@ cell terrain::getNextState(int x, int y)
 
     cell returnState;
 
-    if(cells[y-yRangeLow][x-xRangeLow] == ALIVE)
+    if(cells[y][x] == ALIVE)
     {
         if(liveNeighbors == 2 || liveNeighbors == 3)
         {
@@ -508,4 +562,6 @@ cell terrain::getNextState(int x, int y)
             returnState = DEAD;
         }
     }
+
+    return returnState;
 }

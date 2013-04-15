@@ -49,7 +49,12 @@ string getInputFileName(vector<string> argStrings)
 
     for(vector<string>::iterator it = argStrings.begin(); it != argStrings.end(); it++)
     {
-        if((*it)[0] = '-')
+        if((*it) == "-g" ||
+           (*it) == "-a" ||
+           (*it) == "-tx" ||
+           (*it) == "-ty" ||
+           (*it) == "-wy" ||
+           (*it) == "-wx")
         {
             hadSwitchBefore = true;
             continue;
@@ -72,7 +77,7 @@ string getInputFileName(vector<string> argStrings)
 
 int main(int argc, char** argv)
 {
-    vector<string> argvString(argc - 1);
+    vector<string> argvString(0);
 
     for(int i = 1; i < argc; i++)
     {
@@ -126,10 +131,12 @@ int main(int argc, char** argv)
     if(wxFlag)
     {
         wxRange = getRange(argvString,"-wx");
+        terra.setWXRange(wxRange);
     }
     if(wyFlag)
     {
         wyRange = getRange(argvString,"-wy");
+        terra.setWYRange(wyRange);
     }
 
     if(aFlag)

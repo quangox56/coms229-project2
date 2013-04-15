@@ -16,3 +16,8 @@ clean:
 	rm -rf obj
 	rm -rf bin
 	rm -f core.*
+	rm -rf test/generatedaut
+	rm -rf test/showgenoutput
+
+test: all
+	python test/fuzzy.py test bin
