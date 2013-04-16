@@ -129,23 +129,26 @@ istream& operator>>(istream& in, terrain& cT)
                     if(keywords[j] == "Initial")//Initial requires special handling
                     {
                         delete iss;
-                        i++;
-                        string cmpdStatement = autFileStatements[i-1] + autFileStatements[i];
-                        while(autFileStatements[i].find("}") == string::npos)
+                        string cmpdStatement = autFileStatements[i];
+                        if(autFileStatements[i].find("}") == string::npos)
                         {
+                            while(autFileStatements[i].find("}") == string::npos)
+                            {
+                                if(i < semicolonCount)
+                                {
+                                    i++;
+                                    cmpdStatement += autFileStatements[i];
+                                }
+                                else
+                                {
+                                    break;
+                                }
+                            }
+                            i++;
                             if(i < semicolonCount)
                             {
                                 cmpdStatement += autFileStatements[i];
-                                i++;
                             }
-                            else
-                            {
-                                break;
-                            }
-                        }
-                        if(i < semicolonCount)
-                        {
-                            cmpdStatement += autFileStatements[i];
                         }
 
                         //Remove the keyword from the string.
@@ -209,19 +212,19 @@ ostream& operator<<(ostream& out, terrain& cT)
             y >= cT.wyRangeLow - cT.yRangeLow;
             y--)
         {
-            out << "Y = " << y << " : ";
             bool firstX = true;
             for(int x = cT.wxRangeLow - cT.xRangeLow; 
                     x <= (cT.wxRangeLow - cT.xRangeLow) + (cT.wxRangeHigh - cT.wxRangeLow);
                     x++)
             {
                 if(0 <= y && y <= cT.yRangeHigh-cT.yRangeLow &&
-                   0 <= x && x <= cT.xRangeHigh-cT.xRangeLow)
+                        0 <= x && x <= cT.xRangeHigh-cT.xRangeLow)
                 {
                     if(cT.cells[y][x] == ALIVE)
                     {
                         if(firstX)
                         {
+                            out << "Y = " << y << " : ";
                             out << x;
                             firstX = false;
                         }
@@ -232,7 +235,11 @@ ostream& operator<<(ostream& out, terrain& cT)
                     }
                 }
             }
-            out << ";" << endl;
+            if(!firstX)
+            {
+
+                out << ";" << endl;
+            }
         }
         out << "};" << endl;
 
@@ -525,7 +532,7 @@ void terrain::simulate(int cycles)
         {
             for(int x = 0; x <= xRangeHigh-xRangeLow; x++)
             {
-                tmpCells[y-yRangeLow][x-xRangeLow] = getNextState(x-xRangeLow,y-yRangeLow);
+                tmpCells[y][x] = getNextState(x,y);
             }
         }
         cycles--;

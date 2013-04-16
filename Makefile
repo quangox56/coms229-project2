@@ -2,7 +2,7 @@ all: showgen
 
 showgen: showgen.o terrain.o
 	mkdir -p bin
-	g++ obj/showgen.o obj/terrain.o -o bin/showgen
+	g++ -g obj/showgen.o obj/terrain.o -o bin/showgen
 
 terrain.o: src/terrain.cpp src/terrain.h src/common.h
 	mkdir -p obj
