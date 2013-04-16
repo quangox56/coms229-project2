@@ -126,7 +126,7 @@ istream& operator>>(istream& in, terrain& cT)
             {
                 if(found == 0)//Keyword must be at the start of the statement
                 {
-                    if(keywords[j] == "Initial")
+                    if(keywords[j] == "Initial")//Initial requires special handling
                     {
                         delete iss;
                         i++;
@@ -172,7 +172,7 @@ istream& operator>>(istream& in, terrain& cT)
     delete[] autFileStatements;
 
     //Check that all required keywords were found.
-    for(int i = 0; i < NUM_KEYWORDS; i++)
+    for(int i = 0; i < REQ_KEYWORDS; i++)
     {
         if(!keywordsFound[i])
         {
@@ -251,11 +251,11 @@ ostream& operator<<(ostream& out, terrain& cT)
                 if(0 <= y && y <= cT.yRangeHigh-cT.yRangeLow &&
                    0 <= x && x <= cT.xRangeHigh-cT.xRangeLow)
                 {
-                    out << (cT.cells[y][x] ? "1":"~");
+                    out << (cT.cells[y][x] ? cT.liveChar:cT.deadChar);
                 }
                 else
                 {
-                    out << "~";
+                    out << cT.deadChar;
                 }
             }
             out << endl;
@@ -446,9 +446,28 @@ void terrain::handleKeyword(istringstream& iss, string keyword)
 
         }
     }
+    else if(keyword == "Chars")
+    {
+        char comma, semicolon;
+        if(!(iss >> deadChar) || 
+                !(iss >> comma) || 
+                !(iss >> liveChar) || 
+                !(iss >> semicolon))
+        {
+            cerr << "There was an error in the Chars statement." << endl;
+            cerr << "Program is now exiting with error." << endl;
+            exit(1);
+        }
+        if(semicolon != ';' || comma != ',')
+        {
+            cerr << "There was an error in the Chars statement." << endl;
+            cerr << "Program is now exiting with error." << endl;
+            exit(1);
+        }
+    }
     else
     {
-        cerr << "Shouldnt reach here, invalid keyword passed.\n";
+        cerr << "Shouldnt reach here, unhandled keyword passed.\n";
     }
 }
 
@@ -460,6 +479,8 @@ terrain::terrain()
     yRangeSet = false;
     wxRangeSet = false;
     wyRangeSet = false;
+    deadChar = '~';
+    liveChar = '1';
 }
     
 void terrain::setYRange(range_t yRange)

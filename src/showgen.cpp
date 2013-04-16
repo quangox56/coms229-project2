@@ -59,15 +59,15 @@ string getInputFileName(vector<string> argStrings)
             hadSwitchBefore = true;
             continue;
         }
-        else
-        {
-            hadSwitchBefore = false;
-        }
 
         if(!hadSwitchBefore)
         {
             returnFileName = *it;
             break;
+        }
+        else
+        {
+            hadSwitchBefore = false;
         }
     }
     

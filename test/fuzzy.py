@@ -8,7 +8,7 @@ def mkdir_p(path):
       pass
     else: raise
 
-n = 100;
+n = 1;
 if (len(sys.argv)!=3):
   print "usage: python fuzzy.py testdir execdir"
   sys.exit(0)

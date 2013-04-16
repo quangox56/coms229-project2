@@ -25,6 +25,9 @@ class terrain
     int wyRangeLow;
     int wyRangeHigh;
 
+    char deadChar;
+    char liveChar;
+
     bool xRangeSet;
     bool yRangeSet;
     bool wxRangeSet;
