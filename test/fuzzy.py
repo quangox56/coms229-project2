@@ -8,7 +8,7 @@ def mkdir_p(path):
       pass
     else: raise
 
-n = 5;
+n = 100;
 if (len(sys.argv)!=3):
   print "usage: python fuzzy.py testdir execdir"
   sys.exit(0)
@@ -123,7 +123,7 @@ for counter in range(0,n):
       for x in range(autxLow, autxHigh+1):
         #also print input stuff for 308 program
         if(random.choice([True,False])):
-          if(y >= yLow and y <= yHigh and x <= xLow and x <= xHigh):
+          if(y >= yLow and y <= yHigh and x >= xLow and x <= xHigh):
             oracleList[y-yLow][x-xLow] = 1
           if (firstX):
             written = True
@@ -138,14 +138,17 @@ for counter in range(0,n):
           if(y >= yLow and y <= yHigh and x >= xLow and x <= xHigh):
             oracleList[y-yLow][x-xLow] = 0
       if (not written):
-        f.write(str(random.randint(autxLow, autxHigh)))
+        randomInt = random.randint(autxLow, autxHigh)
+        f.write(str(randomInt))
+        if(y >= yLow and y <= yHigh and randomInt >= xLow and randomInt <= xHigh):
+          oracleList[y-yLow][randomInt-xLow] = 1
       f.write(";\n")
       firstX = True
     else:
       for x in range(autxLow, autxHigh+1):
         #these are constricted ranges presented by the args. This
         #output is used for 308-file calculations
-        if(y <= yLow and y <= yHigh and x <= xLow and x <= xHigh):
+        if(y >= yLow and y <= yHigh and x >= xLow and x <= xHigh):
           oracleList[y-yLow][x-xLow] = 0
   f.write("};\n")
   f.flush()
@@ -170,24 +173,23 @@ for counter in range(0,n):
   tmp = oracleList[:][:]
   #for EVEN generations, oracleList is PREV
   #for ODD generations, tmp is PREV
-  genNum = 0
   for genNum in range(0,runToGen):
     #for y in range(0,yHigh-yLow):
-    for y in range(len(oracleList)): 
+    #for y in range(len(oracleList)): 
+    for y in range(wyLow-yLow, (wyLow-yLow)+(wyHigh-wyLow)+1):
       #for x in range(0,xHigh-xLow):
-      for x in range(len(oracleList[y])):
+      #for x in range(len(oracleList[y])):
+      for x in range(wxLow-xLow, (wxLow-xLow)+(wxHigh-wxLow)+1):
         liveNeighbors = 0
         i = y-1
         j = x-1
         #convoluted way of counting the live neighbors
+        #Don't judge me foo!
         while(i <= y+1):
           while(j <= x+1):
-            #TODO this needs to check the terrain/display bounds, ADJUSTED for list index offset
             if(i >= yLow and i <= yHigh and j >= xLow and j <= xHigh):
               if(i != y and j != x):
                 if (i >= 0 and i < len(oracleList) and j >= 0 and j < len(oracleList[0])):
-                  #TODO check the indexing math here to make sure it's alright. I think it's fine,
-                  #but checking against xLow and co just above here makes me uneasy
                   if (genNum%2 == 0):
                     liveNeighbors += oracleList[i][j]
                   else:
@@ -198,10 +200,13 @@ for counter in range(0,n):
 
         preval = 0
         nowval = 0
-        if (genNum%2 == 0):
-          preval = oracleList[y][x]
+        if(y >= yLow and y <= yHigh and x >= xLow and x <= xHigh):
+          if (genNum%2 == 0):
+            preval = oracleList[y][x]
+          else:
+            preval = tmp[y][x]
         else:
-          preval = tmp[y][x]
+            preval = 0
 
         if(preval == 1):
           if(liveNeighbors == 2 or liveNeighbors == 3):
@@ -214,17 +219,19 @@ for counter in range(0,n):
           else:
             nowval = 0
         if (genNum%2 == 0):
-          tmp[y][x] = nowval
+          if(y >= yLow and y <= yHigh and x >= xLow and x <= xHigh):
+            tmp[y][x] = nowval
         else:
-          oracleList[y][x]= nowval
-  if (genNum%2 == 0):
+          if(y >= yLow and y <= yHigh and x >= xLow and x <= xHigh):
+            oracleList[y][x]= nowval
+  if (runToGen%2 == 0):
     #now oracleList contains the current values either way
     oracleList = tmp[:][:]
   #crop and diff
 
   testF = open(testdir + "/showgenoutput/test" + str(counter) + ".229")
   testPassed = True
-  for y in range(wyLow-yLow, (wyLow-yLow)+(wyHigh-wyLow)+1):
+  for y in range((wyLow-yLow)+(wyHigh-wyLow), wyLow-yLow+1):
     for x in range(wxLow-xLow, (wxLow-xLow)+(wxHigh-wxLow)+1):
       cell = testF.read(1)
 
@@ -232,18 +239,18 @@ for counter in range(0,n):
       if (y > yHigh or y < yLow or x > xHigh or x < xLow):
         if (cell != deadChar):
           testPassed = False
-          #print "Test " + str(counter) + " failed at window index ("+str(x)+","+str(y)+")"
+          print "Test " + str(counter) + " failed at window index ("+str(x)+","+str(y)+")"
       else:
-        if((cell != liveChar and oracleList[y][x] == '1')):
+        if((cell != liveChar and oracleList[y][x] == 1)):
           testPassed = False
-          #print "Test " + str(counter) + " failed at window index ("+str(x)+","+str(y)+")"
-        elif((cell != deadChar and oracleList[y][x] == '0')):
+          print "Test " + str(counter) + " failed at window index ("+str(x)+","+str(y)+")"
+        elif((cell != deadChar and oracleList[y][x] == 0)):
           testPassed = False
-          #print "Test " + str(counter) + " failed at window index ("+str(x)+","+str(y)+")"
+          print "Test " + str(counter) + " failed at window index ("+str(x)+","+str(y)+")"
     returnStatement = testF.read(1)
     if(returnStatement != '\n'):#TODO will this fail on windows machines (not that I care)?
       testPassed = False
-      #print "Test " + str(counter) + " failed at y=" + str(y) + "with no return statement"
+      print "Test " + str(counter) + " failed at y=" + str(y) + "with no return statement"
   testF.flush()
   testF.close()
   if(testPassed):

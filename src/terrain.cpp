@@ -527,6 +527,7 @@ void terrain::simulate(int cycles)
 {
     while(cycles > 0)
     {
+        //TODO: limit this to window range, not complete range.
         vector< vector<cell> > tmpCells(cells);
         for(int y = 0; y <= yRangeHigh-yRangeLow; y++)
         {
