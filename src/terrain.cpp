@@ -179,9 +179,7 @@ istream& operator>>(istream& in, terrain& cT)
     {
         if(!keywordsFound[i])
         {
-            cerr << "Error: Not all required keywords found in .aut file." << endl;
-            cerr << "Program exiting in error." << endl;
-            exit(1);
+            exitWithErr("Error: Not all required keywords found in .aut file.");
         }
     }
 
@@ -258,11 +256,11 @@ ostream& operator<<(ostream& out, terrain& cT)
                 if(0 <= y && y <= cT.yRangeHigh-cT.yRangeLow &&
                    0 <= x && x <= cT.xRangeHigh-cT.xRangeLow)
                 {
-                    out << (cT.cells[y][x] ? cT.liveChar:cT.deadChar);
+                    out << (cT.cells[y][x] ? cT.stateChars[1]:cT.stateChars[0]);
                 }
                 else
                 {
-                    out << cT.deadChar;
+                    out << cT.stateChars[0];
                 }
             }
             out << endl;
@@ -292,15 +290,11 @@ void terrain::handleKeyword(istringstream& iss, string keyword)
             char semicolon;
             if((!(iss >> xRangeLow) || !(iss >> xRangeHigh) || !(iss >> semicolon)))
             {
-                cerr << "There was an error in the xRange statement." << endl;
-                cerr << "Program is now exiting with error." << endl;
-                exit(1);
+                exitWithErr("There was an error in the xRange statement.");
             }
             if(semicolon != ';')
             {
-                cerr << "There was an error in the xRange statement." << endl;
-                cerr << "Program is now exiting with error." << endl;
-                exit(1);
+                exitWithErr("There was an error in the xRange statement.");
             }
         }
     }
@@ -311,15 +305,11 @@ void terrain::handleKeyword(istringstream& iss, string keyword)
             char semicolon;
             if((!(iss >> yRangeLow) || !(iss >> yRangeHigh) || !(iss >> semicolon)))
             {
-                cerr << "There was an error in the yRange statement." << endl;
-                cerr << "Program is now exiting with error." << endl;
-                exit(1);
+                exitWithErr("There was an error in the yRange statement.");
             }
             if(semicolon != ';')
             {
-                cerr << "There was an error in the yRange statement." << endl;
-                cerr << "Program is now exiting with error." << endl;
-                exit(1);
+                exitWithErr("There was an error in the yRange statement.");
             }
         }
     }
@@ -343,25 +333,19 @@ void terrain::handleKeyword(istringstream& iss, string keyword)
         //Parse the begining of the compound statement
         if((!(iss >> leftBracket)))
         {
-            cerr << "There was an error in the Initial statement." << endl;
-            cerr << "Program is now exiting with error." << endl;
-            exit(1);
+            exitWithErr("There was an error in the Initial statement.");
         }
         else
         {
             if(leftBracket != '{')
             {
-                cerr << "There was an error in the Initial statement." << endl;
-                cerr << "Program is now exiting with error." << endl;
-                exit(1);
+                exitWithErr("There was an error in the Initial statement.");
             }
         }
 
         if(!(iss >> rightBracket))
         {
-            cerr << "There was an error in the Initial statement." << endl;
-            cerr << "Program is now exiting with error." << endl;
-            exit(1);
+            exitWithErr("There was an error in the Initial statement.");
         }
         else
         {
@@ -375,17 +359,13 @@ void terrain::handleKeyword(istringstream& iss, string keyword)
                     //parse the Y value
                     if((!(iss>>Y) || !(iss>>equals) || !(iss>>y) || !(iss>>colon)))
                     {
-                        cerr << "There was an error in the Initial statement." << endl;
-                        cerr << "Program is now exiting with error." << endl;
-                        exit(1);
+                        exitWithErr("There was an error in the Initial statement.");
                     }
                     else
                     {
                         if(Y != 'Y' || equals != '=' || colon != ':')
                         {
-                            cerr << "There was an error in the Initial statement." << endl;
-                            cerr << "Program is now exiting with error." << endl;
-                            exit(1);
+                            exitWithErr("There was an error in the Initial statement.");
                         }
                     }
 
@@ -394,17 +374,13 @@ void terrain::handleKeyword(istringstream& iss, string keyword)
                     {
                         if(!(iss>>x) || !(iss>>comma))
                         {
-                            cerr << "There was an error in the Initial statement." << endl;
-                            cerr << "Program is now exiting with error." << endl;
-                            exit(1);
+                            exitWithErr("There was an error in the Initial statement.");
                         }
                         else
                         {
                             if(comma != ',' && comma != ';')
                             {
-                                cerr << "There was an error in the Initial statement." << endl;
-                                cerr << "Program is now exiting with error." << endl;
-                                exit(1);
+                                exitWithErr("There was an error in the Initial statement.");
                             }
 
                             if(y >=yRangeLow && y <= yRangeHigh &&
@@ -417,9 +393,7 @@ void terrain::handleKeyword(istringstream& iss, string keyword)
 
                     if(!(iss>>rightBracket))
                     {
-                        cerr << "There was an error in the Initial statement." << endl;
-                        cerr << "Program is now exiting with error." << endl;
-                        exit(1);
+                        exitWithErr("There was an error in the Initial statement.");
                     }
                     else
                     {
@@ -436,17 +410,13 @@ void terrain::handleKeyword(istringstream& iss, string keyword)
                 }
                 if(!(iss>>semicolon))
                 {
-                    cerr << "There was an error in the Initial statement." << endl;
-                    cerr << "Program is now exiting with error." << endl;
-                    exit(1);
+                    exitWithErr("There was an error in the Initial statement.");
                 }
                 else
                 {
                     if(semicolon != ';')
                     {
-                        cerr << "There was an error in the Initial statement." << endl;
-                        cerr << "Program is now exiting with error." << endl;
-                        exit(1);
+                        exitWithErr("There was an error in the Initial statement.");
                     }
                 }
             }
@@ -455,21 +425,156 @@ void terrain::handleKeyword(istringstream& iss, string keyword)
     }
     else if(keyword == "Chars")
     {
-        char comma, semicolon;
-        if(!(iss >> deadChar) || 
-                !(iss >> comma) || 
-                !(iss >> liveChar) || 
-                !(iss >> semicolon))
+        int charIndex = 0;
+        int asciiHolder = 0;
+
+        char comma = ',';
+        do
         {
-            cerr << "There was an error in the Chars statement." << endl;
-            cerr << "Program is now exiting with error." << endl;
-            exit(1);
+            if(charIndex >= 10)//There is a max of 10 possible states with langston's ants
+            {
+                if(comma != ',')
+                {
+                    exitWithErr("There was an error in the Chars statement.");
+                }
+                if(!(iss >> asciiHolder) &&
+                        !(iss >> comma))
+                {
+                    exitWithErr("There was an error in the Chars statement.");
+                }
+                if(asciiHolder >= 0 && asciiHolder <= 255)
+                {
+                    stateChars[charIndex] = asciiHolder;
+                }
+                else
+                {
+                    exitWithErr("There was an error in the Chars statement.");
+                }   
+                charIndex++;
+            }
+        }while(comma != ';');
+        
+    }
+    else if(keyword == "Name")
+    {   
+        //TODO: Handle the case of a semicolon inside the quotes.
+        //This will require some changes inside the operator>> function
+        char readChar;
+        if(!(iss >> readChar))
+        {
+            exitWithErr("There was an error in the Name statement.");
         }
-        if(semicolon != ';' || comma != ',')
+        if(readChar != '"')
         {
-            cerr << "There was an error in the Chars statement." << endl;
-            cerr << "Program is now exiting with error." << endl;
-            exit(1);
+            exitWithErr("There was an error in the Name statement.");
+        }
+
+        do
+        {
+            if(!(iss >> readChar))
+            {
+                exitWithErr("There was an error in the Name statement.");
+            }
+            name += readChar;
+        }while(readChar != '"');
+
+        if(!(iss >> readChar))
+        {
+            exitWithErr("There was an error in the Name statement.");
+        }
+
+        if(readChar != ';')
+        {
+            exitWithErr("There was an error in the Name statement.");
+        }
+
+    }
+    else if(keyword == "Colors")
+    {
+        char readChar;
+        size_t colorIndex = 0;
+        color_t colorToRead;
+
+        do
+        {
+            //Read the first paren enclosing the colors
+            if(!(iss >> readChar))
+            {
+                exitWithErr("There was an error in the Colors statement.");
+            }
+            if(readChar != '(')
+            {
+                exitWithErr("There was an error in the Colors statement.");
+            }
+            //Read the red value
+            if(!(iss >> colorToRead.r))
+            {
+                exitWithErr("There was an error in the Colors statement.");
+            }
+            //read the comma between red and green
+            if(!(iss >> readChar))
+            {
+                exitWithErr("There was an error in the Colors statement.");
+            }
+            if(readChar != ',')
+            {
+                exitWithErr("There was an error in the Colors statement.");
+            }
+            //read the green value
+            if(!(iss >> colorToRead.g))
+            {
+                exitWithErr("There was an error in the Colors statement.");
+            }
+            //read the comma between green and blue
+            if(!(iss >> readChar))
+            {
+                exitWithErr("There was an error in the Colors statement.");
+            }
+            if(readChar != ',')
+            {
+                exitWithErr("There was an error in the Colors statement.");
+            }
+            //read the blue value
+            if(!(iss >> colorToRead.b))
+            {
+                exitWithErr("There was an error in the Colors statement.");
+            }
+            //read the closing paren
+            if(!(iss >> readChar))
+            {
+                exitWithErr("There was an error in the Colors statement.");
+            }
+            if(readChar != ')')
+            {
+                exitWithErr("There was an error in the Colors statement.");
+            }
+            //RGB needs to range from 0 to 255
+            if(colorToRead.r < 0 || colorToRead.r > 255 ||
+                    colorToRead.g < 0 || colorToRead.g > 255 ||  
+                    colorToRead.b < 0 || colorToRead.b > 255)
+            {
+                exitWithErr("There was an error in the Colors statement.");
+            }
+
+            //Add the color we just read to the stored colors variable
+            if(colorIndex < 10)//Max amount of colors we have to deal with is 10
+            {
+                stateColors[colorIndex] = colorToRead;
+                colorIndex++;
+            }
+
+            //if this char is a comma we have another color value to read
+            if(!(iss >> readChar))
+            {
+                exitWithErr("There was an error in the Colors statement.");
+            }
+            //else leave the while
+        }while(readChar == ',');
+
+        //make sure there is a semicolon at the end.
+        if(readChar != ';')
+        {
+            exitWithErr("There was an error in the Colors statement.");
         }
     }
     else
@@ -486,8 +591,70 @@ terrain::terrain()
     yRangeSet = false;
     wxRangeSet = false;
     wyRangeSet = false;
-    deadChar = '~';
-    liveChar = '1';
+    stateChars.resize(10);//There is a max of 10 states with langton's ants
+    stateColors.resize(10);
+
+    //Setting default states
+    stateChars[0] = '~';
+    stateChars[1] = '1';
+    stateChars[2] = '2';
+    stateChars[3] = '3';
+    stateChars[4] = '4';
+    stateChars[5] = '5';
+    stateChars[6] = '6';
+    stateChars[7] = '7';
+    stateChars[8] = '8';
+    stateChars[9] = '9';
+
+    //Black
+    stateColors[0].r = 0;
+    stateColors[0].g = 0;
+    stateColors[0].b = 0;
+
+    //White
+    stateColors[1].r = 255;
+    stateColors[1].g = 255;
+    stateColors[1].b = 255;
+
+    //Brown
+    stateColors[2].r = 102;
+    stateColors[2].g = 51;
+    stateColors[2].b = 0;
+
+    //Red
+    stateColors[3].r = 255;
+    stateColors[3].g = 0;
+    stateColors[3].b = 0;
+
+    //Orange
+    stateColors[4].r = 255;
+    stateColors[4].g = 128;
+    stateColors[4].b = 0;
+
+    //Yellow
+    stateColors[5].r = 255;
+    stateColors[5].g = 255;
+    stateColors[5].b = 0;
+
+    //Green
+    stateColors[6].r = 0;
+    stateColors[6].g = 255;
+    stateColors[6].b = 0;
+
+    //Teal
+    stateColors[7].r = 0;
+    stateColors[7].g = 255;
+    stateColors[7].b = 255;
+
+    //Blue
+    stateColors[8].r = 0;
+    stateColors[8].g = 0;
+    stateColors[8].b = 255;
+
+    //Purple
+    stateColors[9].r = 111;
+    stateColors[9].g = 0;
+    stateColors[9].b = 255;
 }
     
 void terrain::setYRange(range_t yRange)
@@ -568,8 +735,11 @@ int terrain::numberOfLiveNeighbors(int x, int y)
     {
         for(int j = x-1; j <= x+1; j++)
         {
-            if(0 <= i && i <= yRangeHigh-yRangeLow &&
-               0 <= j && j <= xRangeHigh-xRangeLow)
+            //Make sure the cell is inside the window range
+            if((wyRangeLow-yRangeLow) <= i && 
+                    i <= ((wyRangeLow-yRangeLow)+(wyRangeHigh-wyRangeLow)) &&
+                    (wxRangeLow-xRangeLow) <= j && 
+                    j <= ((wyRangeLow-yRangeLow)+(wyRangeHigh-wyRangeLow)))
             {
                 //The cell can't be it's own neighbor
                 if(i != y && x != j)

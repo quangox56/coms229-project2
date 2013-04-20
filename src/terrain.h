@@ -25,8 +25,10 @@ class terrain
     int wyRangeLow;
     int wyRangeHigh;
 
-    char deadChar;
-    char liveChar;
+    vector<char> stateChars;
+    vector<color_t> stateColors;
+
+    string name;
 
     bool xRangeSet;
     bool yRangeSet;
