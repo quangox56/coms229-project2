@@ -525,15 +525,35 @@ void terrain::setPrintModeAut(bool _printAut)
 
 void terrain::simulate(int cycles)
 {
+    if(!wxRangeSet)
+    {
+        wxRangeLow = xRangeLow;
+        wxRangeHigh = xRangeHigh;
+    }
+    if(!wyRangeSet)
+    {
+        wyRangeLow = yRangeLow;
+        wyRangeHigh = yRangeHigh;
+    }
+
     while(cycles > 0)
     {
-        //TODO: limit this to window range, not complete range.
         vector< vector<cell> > tmpCells(cells);
-        for(int y = 0; y <= yRangeHigh-yRangeLow; y++)
+        for(int y = wyRangeLow - yRangeLow; 
+            y <= (wyRangeLow - yRangeLow) + (wyRangeHigh - wyRangeLow);
+            y++)
         {
-            for(int x = 0; x <= xRangeHigh-xRangeLow; x++)
+            for(int x = wxRangeLow - xRangeLow; 
+                    x <= (wxRangeLow - xRangeLow) + (wxRangeHigh - wxRangeLow);
+                    x++)
             {
-                tmpCells[y][x] = getNextState(x,y);
+                if(0 <= y && y <= cells.size())
+                {
+                    if(0 <= x && x <= cells[y].size())
+                    {
+                        tmpCells[y][x] = getNextState(x,y);
+                    }
+                }
             }
         }
         cycles--;
