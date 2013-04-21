@@ -692,26 +692,16 @@ void terrain::setPrintModeAut(bool _printAut)
 
 void terrain::simulate(int cycles)
 {
-    if(!wxRangeSet)
-    {
-        wxRangeLow = xRangeLow;
-        wxRangeHigh = xRangeHigh;
-    }
-    if(!wyRangeSet)
-    {
-        wyRangeLow = yRangeLow;
-        wyRangeHigh = yRangeHigh;
-    }
 
     while(cycles > 0)
     {
         vector< vector<cell> > tmpCells(cells);
-        for(int y = wyRangeLow - yRangeLow; 
-            y <= (wyRangeLow - yRangeLow) + (wyRangeHigh - wyRangeLow);
+        for(int y = 0; 
+            y <= (yRangeHigh-yRangeLow);
             y++)
         {
-            for(int x = wxRangeLow - xRangeLow; 
-                    x <= (wxRangeLow - xRangeLow) + (wxRangeHigh - wxRangeLow);
+            for(int x = 0; 
+                    x <= (xRangeHigh-xRangeLow);
                     x++)
             {
                 if(0 <= y && y <= cells.size())
@@ -735,11 +725,9 @@ int terrain::numberOfLiveNeighbors(int x, int y)
     {
         for(int j = x-1; j <= x+1; j++)
         {
-            //Make sure the cell is inside the window range
-            if((wyRangeLow-yRangeLow) <= i && 
-                    i <= ((wyRangeLow-yRangeLow)+(wyRangeHigh-wyRangeLow)) &&
-                    (wxRangeLow-xRangeLow) <= j && 
-                    j <= ((wyRangeLow-yRangeLow)+(wyRangeHigh-wyRangeLow)))
+            //Make sure the cell is inside the range
+            if(0 <= i && i <= (yRangeHigh-yRangeLow) &&
+               0 <= j && j <= (xRangeHigh-xRangeLow))
             {
                 //The cell can't be it's own neighbor
                 if(i != y && x != j)
