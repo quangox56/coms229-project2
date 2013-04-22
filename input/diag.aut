@@ -1,5 +1,6 @@
 Xrange 0 4;
 Yrange 0 4;
+Name "Diagonal";
 
 Initial {
   Y = 0 : 0;

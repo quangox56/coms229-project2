@@ -475,7 +475,10 @@ void terrain::handleKeyword(istringstream& iss, string keyword)
             {
                 exitWithErr("There was an error in the Name statement.");
             }
-            name += readChar;
+            if(readChar != '"')
+            {
+                name += readChar;
+            }
         }while(readChar != '"');
 
         if(!(iss >> readChar))
@@ -771,4 +774,46 @@ cell terrain::getNextState(int x, int y)
     }
 
     return returnState;
+}
+
+char getWindowState(int x, int y)
+{
+    //TODO: placeholder, implement this to return the window adjusted coordinates.
+    return 'F';
+}
+
+string terrain::getName()
+{
+    return name;
+}
+
+range_t terrain::getYRange()
+{
+    range_t returnRange;
+    returnRange.high = yRangeHigh;
+    returnRange.low = yRangeLow;
+    return returnRange;
+}
+
+range_t terrain::getXRange()
+{
+    range_t returnRange;
+    returnRange.high = xRangeHigh;
+    returnRange.low = xRangeLow;
+    return returnRange;
+}
+
+char terrain::getWindowState(int x, int y)
+{
+    int wY = (wyRangeLow - yRangeLow) + (wyRangeHigh - wyRangeLow) - y;
+    int wX = wxRangeLow - xRangeLow + x;
+    if(0 <= wY && wY <= yRangeHigh-yRangeLow &&
+            0 <= wX && wX <= xRangeHigh-xRangeLow)
+    {
+        return stateChars[cells[wY][wX]];
+    }
+    else
+    {
+        return stateChars[0];
+    }
 }

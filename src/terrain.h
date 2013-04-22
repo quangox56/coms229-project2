@@ -53,20 +53,20 @@ class terrain
     terrain();
 
     //Setters
-    inline void setYRange(range_t yRange);
-    inline void setXRange(range_t xRange);
-    inline void setWYRange(range_t wyRange);
-    inline void setWXRange(range_t wxRange);
-    inline void setPrintModeAut(bool _printAut);
-    inline void simulate(int cycles);
+    void setYRange(range_t yRange);
+    void setXRange(range_t xRange);
+    void setWYRange(range_t wyRange);
+    void setWXRange(range_t wxRange);
+    void setPrintModeAut(bool _printAut);
+    void simulate(int cycles);
 
     //Getters
-    inline char getState(int x, int y);
-    inline string getName();
-    inline range_t getYRange();
-    inline range_t getXRange();
-    inline range_t getWYRange();
-    inline range_t getWXRange();
+    char getWindowState(int x, int y);
+    string getName();
+    range_t getYRange();
+    range_t getXRange();
+    range_t getWYRange();
+    range_t getWXRange();
     
     friend istream& operator>>(istream& in, terrain& cTerrain);
     friend ostream& operator<<(ostream& out, terrain& cTerrain);

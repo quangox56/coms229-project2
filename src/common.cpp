@@ -74,5 +74,16 @@ string getInputFileName(vector<string> argStrings)
 
 }
 
+int countDigits(int num)
+{
+    int count = 0;
+    while(num)
+    {
+        num=num/10;
+        count++;
+    }
+
+    return count;
+}
 
 
