@@ -42,7 +42,7 @@ void initDisplay(winParam &wp)
     keypad(stdscr, TRUE);
     cbreak();
     noecho();
-    //TODO: hide cursor
+    curs_set(0);//Set cursor invisible
     getmaxyx(stdscr, wp.row, wp.col);
     if(wp.col < 40 || wp.row < 20)
     {
@@ -221,7 +221,7 @@ void handleKeys(keys &k, winParam &wp)
     }
 }
 
-int main(size_t argc, char** argv)
+int main(int argc, char** argv)
 {
     vector<string> argvString(0);
 
