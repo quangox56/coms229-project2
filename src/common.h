@@ -32,6 +32,5 @@ void exitWithErr(std::string error);
 bool optionExists(std::vector<std::string> argStrings, std::string option);
 range_t getRange(std::vector<std::string> argStrings, std::string option);
 std::string getInputFileName(std::vector<std::string> argStrings);
-int countDigits(int num);
 
 #endif
