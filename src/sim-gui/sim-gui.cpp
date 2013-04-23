@@ -3,7 +3,8 @@
 #include <QSlider>
 #include <QSpinBox>
 #include <QPushButton>
-#include "finddialog.h"
+//#include "finddialog.h"
+#include "IconEditor.h"
 
 int main(int argc, char *argv[])
 {
@@ -35,7 +36,8 @@ int main(int argc, char *argv[])
     return app.exec();
     */
     QApplication app(argc, argv);
-    FindDialog *dialog = new FindDialog;
+    //FindDialog *dialog = new FindDialog;
+    IconEditor *dialog = new IconEditor;
     dialog->show();
     return app.exec();
 }
