@@ -8,7 +8,7 @@ def mkdir_p(path):
       pass
     else: raise
 
-n = 100;
+n = 2;
 if (len(sys.argv)!=3):
   print "usage: python fuzzy.py testdir execdir"
   sys.exit(0)
@@ -108,10 +108,10 @@ for counter in range(0,n):
   ba = random.randint(0,255)
 
   chars = string.ascii_uppercase + string.ascii_lowercase + string.digits
-  liveChar = random.choice(chars)
-  deadChar = random.choice(chars)
+  liveChar = random.randint(0,255)
+  deadChar = random.randint(0,255)
   f.write("Colors (" + str(rd) + ", " + str(gd) + ", " + str(bd) + "), (" + str(ra) + ", " + str(ga) + ", " + str(ba) + ");\n")
-  f.write("Chars " + deadChar + ", " + liveChar + ";\n")
+  f.write("Chars " + str(deadChar) + ", " + str(liveChar) + ";\n")
 
   f.write("Initial {\n")
   firstX = True

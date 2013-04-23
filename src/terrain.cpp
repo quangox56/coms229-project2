@@ -60,6 +60,10 @@ istream& operator>>(istream& in, terrain& cT)
         }
     }
 
+    if(semicolonCount == 0)
+    {
+        exitWithErr("Invalid .aut file. No semicolons.");
+    }
     //This variable will be an array of all the statements in the file.
     //Statements are delimited by semicolons. All Comments have been removed
     //by this point.
@@ -431,27 +435,27 @@ void terrain::handleKeyword(istringstream& iss, string keyword)
         char comma = ',';
         do
         {
-            if(charIndex >= 10)//There is a max of 10 possible states with langston's ants
+            if(comma != ',')
             {
-                if(comma != ',')
-                {
-                    exitWithErr("There was an error in the Chars statement.");
-                }
-                if(!(iss >> asciiHolder) &&
-                        !(iss >> comma))
-                {
-                    exitWithErr("There was an error in the Chars statement.");
-                }
-                if(asciiHolder >= 0 && asciiHolder <= 255)
+                exitWithErr("There was an error in the Chars statement.");
+            }
+            if(!(iss >> asciiHolder) &&
+                    !(iss >> comma))
+            {
+                exitWithErr("There was an error in the Chars statement.");
+            }
+            if(asciiHolder >= 0 && asciiHolder <= 255)
+            {
+                if(charIndex >= 10)//There is a max of 10 possible states with langston's ants
                 {
                     stateChars[charIndex] = asciiHolder;
                 }
-                else
-                {
-                    exitWithErr("There was an error in the Chars statement.");
-                }   
-                charIndex++;
             }
+            else
+            {
+                exitWithErr("There was an error in the Chars statement.");
+            }   
+            charIndex++;
         }while(comma != ';');
         
     }
