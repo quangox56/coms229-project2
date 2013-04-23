@@ -446,9 +446,13 @@ void terrain::handleKeyword(istringstream& iss, string keyword)
             }
             if(asciiHolder >= 0 && asciiHolder <= 255)
             {
-                if(charIndex >= 10)//There is a max of 10 possible states with langston's ants
+                if(charIndex < 10)//There is a max of 10 possible states with langston's ants
                 {
                     stateChars[charIndex] = asciiHolder;
+                }
+                else
+                {
+                    cerr << "Warning: this aut file has more chars than states." << endl;
                 }
             }
             else
