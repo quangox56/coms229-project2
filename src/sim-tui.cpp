@@ -153,7 +153,7 @@ void updateDisplay(winParam &wp)
 
 void handleKeys(keys &k, winParam &wp)
 {
-    halfdelay(wp.delay/100);
+    timeout(wp.delay);
     int ch = getch();
     k.q = (ch == 'q' || ch == 'Q');
     k.p = (ch == 'p' || ch == 'P');
@@ -171,16 +171,16 @@ void handleKeys(keys &k, winParam &wp)
     }
     if(k.plus)
     {
-        if(wp.delay < 9900)
+        if(wp.delay < 9990)
         {
-            wp.delay = wp.delay + 100;
+            wp.delay = wp.delay + 10;
         }
     }
     if(k.minus)
     {
-        if(wp.delay > 100)
+        if(wp.delay > 10)
         {
-            wp.delay = wp.delay - 100;
+            wp.delay = wp.delay - 10;
         }
     }
     if(k.lArr)

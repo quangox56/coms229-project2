@@ -741,7 +741,7 @@ int terrain::numberOfLiveNeighbors(int x, int y)
                0 <= j && j <= (xRangeHigh-xRangeLow))
             {
                 //The cell can't be it's own neighbor
-                if(i != y && x != j)
+                if(!(i == y && x == j))
                 {
                     liveNeighbors += cells[i][j];
                 }

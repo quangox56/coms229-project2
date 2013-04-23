@@ -1,6 +1,6 @@
-Xrange 0 2;
- Yrange 0 2;
+Xrange 0 3;
+ Yrange 0 3;
 Initial {
-  Y=0:0,1,2; 
-  Y=2:1;
+  Y=1:1,2; 
+  Y=2:1,2;
 };
