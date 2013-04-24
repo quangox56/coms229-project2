@@ -60,14 +60,10 @@ istream& operator>>(istream& in, terrain& cT)
         }
     }
 
-    if(semicolonCount == 0)
-    {
-        exitWithErr("Invalid .aut file. No semicolons.");
-    }
     //This variable will be an array of all the statements in the file.
     //Statements are delimited by semicolons. All Comments have been removed
     //by this point.
-    string* autFileStatements = new string[semicolonCount];
+    string* autFileStatements = new string[semicolonCount+1];
     index = 0;
     //Divide the lines into statements delimited by semicolons
     for(int i = 0; i < lineCount; i++)
@@ -101,13 +97,12 @@ istream& operator>>(istream& in, terrain& cT)
     //Trim any beginning whitespace, this can screw up later parsing.
     for(int i = 0; i < semicolonCount; i++)
     {
-        int j = 0;
-        while(autFileStatements[i][j] == ' ' || 
-              autFileStatements[i][j] == '\n' || 
-              autFileStatements[i][j] == '\t' || 
-              autFileStatements[i][j] == '\v' || 
-              autFileStatements[i][j] == '\r' || 
-              autFileStatements[i][j] == '\f')
+        while(autFileStatements[i][0] == ' ' || 
+              autFileStatements[i][0] == '\n' || 
+              autFileStatements[i][0] == '\t' || 
+              autFileStatements[i][0] == '\v' || 
+              autFileStatements[i][0] == '\r' || 
+              autFileStatements[i][0] == '\f')
         {
             autFileStatements[i] = autFileStatements[i].substr(1);
         }
