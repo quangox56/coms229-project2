@@ -7,9 +7,9 @@ IconEditor::IconEditor(QWidget *parent) : QWidget(parent)
     setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 
     curColor = Qt::black;
-    zoom = 8;//TODO: make zoom variable
+    zoom = 4;//TODO: make zoom variable
 
-    image = QImage(16, 16, QImage::Format_ARGB32);//TODO: This makes it 16x16, change later for ranges
+    image = QImage(128, 128, QImage::Format_ARGB32);//TODO: This makes it 16x16, change later for ranges
     image.fill(qRgba(0,0,0,0));//QRgb red = qRgba(255,0,0,255);
 }
 
