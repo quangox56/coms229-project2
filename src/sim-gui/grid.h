@@ -1,11 +1,13 @@
-#ifndef ICONEDITOR_H
-#define ICONEDITOR_H
+#ifndef GRID_H
+#define GRID_H
 
 #include <QColor>
 #include <QImage>
 #include <QWidget>
 
-class IconEditor: public QWidget
+#include "optionsdialog.h"
+
+class grid: public QWidget
 {
     Q_OBJECT
     Q_PROPERTY(QColor penColor READ penColor WRITE setPenColor)
@@ -13,7 +15,7 @@ class IconEditor: public QWidget
     Q_PROPERTY(int zoomFactor READ zoomFactor WRITE setZoomFactor)
 
     public:
-    IconEditor(QWidget *parent = 0);
+    grid(QWidget *parent = 0);
 
     void setPenColor(const QColor &newColor);
     QColor penColor() const { return curColor; }
@@ -37,6 +39,8 @@ class IconEditor: public QWidget
     QColor curColor;
     QImage image;
     int zoom;
+
+    optionsDialog *optionsD;
 };
 
 #endif

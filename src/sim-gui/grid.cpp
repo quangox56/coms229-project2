@@ -1,7 +1,7 @@
 #include <QtGui>
-#include "IconEditor.h"
+#include "grid.h"
 
-IconEditor::IconEditor(QWidget *parent) : QWidget(parent)
+grid::grid(QWidget *parent) : QWidget(parent)
 {
     setAttribute(Qt::WA_StaticContents);
     setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
@@ -11,9 +11,13 @@ IconEditor::IconEditor(QWidget *parent) : QWidget(parent)
 
     image = QImage(128, 128, QImage::Format_ARGB32);//TODO: This makes it 16x16, change later for ranges
     image.fill(qRgba(0,0,0,0));//QRgb red = qRgba(255,0,0,255);
+    optionsD = new optionsDialog(this);
+    optionsD->show();
+    optionsD->activateWindow();
+
 }
 
-QSize IconEditor::sizeHint() const
+QSize grid::sizeHint() const
 {
     QSize size = zoom * image.size();
     if(zoom >= 3)
@@ -21,12 +25,12 @@ QSize IconEditor::sizeHint() const
     return size;
 }
 
-void IconEditor::setPenColor(const QColor &newColor)
+void grid::setPenColor(const QColor &newColor)
 {
     curColor = newColor;
 }
 
-void IconEditor::setIconImage(const QImage &newImage)
+void grid::setIconImage(const QImage &newImage)
 {
     if(newImage != image)
     {
@@ -36,7 +40,7 @@ void IconEditor::setIconImage(const QImage &newImage)
     }
 }
 
-void IconEditor::setZoomFactor(int newZoom)
+void grid::setZoomFactor(int newZoom)
 {
     if(newZoom < 1)
         newZoom = 1;
@@ -49,7 +53,7 @@ void IconEditor::setZoomFactor(int newZoom)
     }
 }
 
-void IconEditor::paintEvent(QPaintEvent *event)
+void grid::paintEvent(QPaintEvent *event)
 {
     QPainter painter(this);
 
@@ -75,7 +79,7 @@ void IconEditor::paintEvent(QPaintEvent *event)
     }
 }
 
-QRect IconEditor::pixelRect(int i, int j) const
+QRect grid::pixelRect(int i, int j) const
 {
     if(zoom >= 3)
     {
@@ -87,7 +91,7 @@ QRect IconEditor::pixelRect(int i, int j) const
     }
 }
 
-void IconEditor::mousePressEvent(QMouseEvent *event)
+void grid::mousePressEvent(QMouseEvent *event)
 {
     if(event->button() == Qt::LeftButton)
     {
@@ -99,7 +103,7 @@ void IconEditor::mousePressEvent(QMouseEvent *event)
     }
 }
 
-void IconEditor::mouseMoveEvent(QMouseEvent *event)
+void grid::mouseMoveEvent(QMouseEvent *event)
 {
     if(event->buttons() & Qt::LeftButton)
     {
@@ -111,7 +115,7 @@ void IconEditor::mouseMoveEvent(QMouseEvent *event)
     }
 }
 
-void IconEditor::setImagePixel(const QPoint &pos, bool opaque)
+void grid::setImagePixel(const QPoint &pos, bool opaque)
 {
     int i = pos.x() / zoom;
     int j = pos.y() / zoom;

@@ -1,7 +1,7 @@
 #include <QtGui>
-#include "finddialog.h"
+#include "optionsdialog.h"
 
-FindDialog::FindDialog(QWidget *parent)
+optionsDialog::optionsDialog(QWidget *parent)
     : QDialog(parent)
 {
     label = new QLabel(tr("Find &what:"));
@@ -47,7 +47,7 @@ FindDialog::FindDialog(QWidget *parent)
     setFixedHeight(sizeHint().height());
 }
 
-void FindDialog::findClicked()
+void optionsDialog::findClicked()
 {
     QString text = lineEdit->text();
     Qt::CaseSensitivity cs = 
@@ -63,7 +63,7 @@ void FindDialog::findClicked()
     } 
 }
 
-void FindDialog::enableFindButton(const QString &text)
+void optionsDialog::enableFindButton(const QString &text)
 {
     findButton->setEnabled(!text.isEmpty());
 }

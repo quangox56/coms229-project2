@@ -434,7 +434,7 @@ void terrain::handleKeyword(istringstream& iss, string keyword)
             {
                 exitWithErr("There was an error in the Chars statement.");
             }
-            if(!(iss >> asciiHolder) &&
+            if(!(iss >> asciiHolder) || 
                     !(iss >> comma))
             {
                 exitWithErr("There was an error in the Chars statement.");

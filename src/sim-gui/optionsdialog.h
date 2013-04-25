@@ -1,5 +1,5 @@
-#ifndef FINDDIALOG_H
-#define FINDDIALOG_H
+#ifndef OPTIONSDIALOG_H
+#define OPTIONSDIALOG_H
 
 #include <QDialog>
 
@@ -8,12 +8,12 @@ class QLabel;
 class QLineEdit;
 class QPushButon;
 
-class FindDialog : public QDialog
+class optionsDialog : public QDialog
 {
     Q_OBJECT
 
     public:
-        FindDialog(QWidget *paretn =0);
+        optionsDialog(QWidget *parent =0);
 
     signals:
         void findNext(const QString &str, Qt::CaseSensitivity cs);
