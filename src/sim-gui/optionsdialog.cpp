@@ -1,9 +1,11 @@
+#include <QString>
 #include <QtGui>
 #include "optionsdialog.h"
 
-optionsDialog::optionsDialog(QWidget *parent)
+optionsDialog::optionsDialog(QWidget *parent, std::string name)
     : QDialog(parent)
 {
+    /*
     label = new QLabel(tr("Find &what:"));
     lineEdit = new QLineEdit;
     label->setBuddy(lineEdit);
@@ -23,32 +25,85 @@ optionsDialog::optionsDialog(QWidget *parent)
             this, SLOT(findClicked()));
     connect(closeButton, SIGNAL(clicked()),
             this, SLOT(close()));
+            */
 
-    QHBoxLayout *topLeftLayout = new QHBoxLayout;
-    topLeftLayout->addWidget(label);
-    topLeftLayout->addWidget(lineEdit);
+    zoomLabel = new QLabel(tr("Zoom factor"));
+    delayLabel = new QLabel(tr("Delay factor"));
+    generationLabel = new QLabel(tr("Generation:"));
+    numberLabel = new QLabel(tr("0"));
 
-    QVBoxLayout *leftLayout = new QVBoxLayout;
-    leftLayout->addLayout(topLeftLayout);
-    leftLayout->addWidget(caseCheckBox);
-    leftLayout->addWidget(backwardCheckBox);
+    zoomSB = new QSpinBox;
+    zoomSB->setRange(1,30);
+    delaySB = new QSpinBox;
+    delaySB->setRange(1,10000);
 
-    QVBoxLayout *rightLayout = new QVBoxLayout;
-    rightLayout->addWidget(findButton);
-    rightLayout->addWidget(closeButton);
-    rightLayout->addStretch();
+    zoomSlid = new QSlider(Qt::Horizontal);
+    zoomSlid->setRange(1,30);
+    QObject::connect(zoomSB, SIGNAL(valueChanged(int)),
+                     zoomSlid, SLOT(setValue(int)));
+    QObject::connect(zoomSlid, SIGNAL(valueChanged(int)),
+                     zoomSB, SLOT(setValue(int)));
+    QObject::connect(zoomSB, SIGNAL(valueChanged(int)),
+                     parent, SLOT(zoomChanged(int)));
+    zoomSB->setValue(10);
+    
 
-    QHBoxLayout *mainLayout = new QHBoxLayout;
-    mainLayout->addLayout(leftLayout);
-    mainLayout->addLayout(rightLayout);
+    delaySlid = new QSlider(Qt::Horizontal);
+    delaySlid->setRange(1,10000);
+    QObject::connect(delaySB, SIGNAL(valueChanged(int)),
+                     delaySlid, SLOT(setValue(int)));
+    QObject::connect(delaySlid, SIGNAL(valueChanged(int)),
+                     delaySB, SLOT(setValue(int)));
+    QObject::connect(delaySB, SIGNAL(valueChanged(int)),
+                     parent, SLOT(delayChanged(int)));
+    delaySB->setValue(100);
+
+    quitButton = new QPushButton(tr("&Quit"));
+    playButton = new QPushButton(tr("&Play"));
+    stepButton = new QPushButton(tr("&Step"));
+    QObject::connect(quitButton, SIGNAL(clicked()),
+            parent, SLOT(quitClicked()));
+    QObject::connect(stepButton, SIGNAL(clicked()),
+            parent, SLOT(stepClicked()));
+    QObject::connect(playButton, SIGNAL(clicked()),
+            parent, SLOT(playClicked()));
+
+
+    QHBoxLayout *zoomLayout = new QHBoxLayout;
+    zoomLayout->addWidget(zoomLabel);
+    zoomLayout->addWidget(zoomSB);
+    zoomLayout->addWidget(zoomSlid);
+
+    QHBoxLayout *delayLayout = new QHBoxLayout;
+    delayLayout->addWidget(delayLabel);
+    delayLayout->addWidget(delaySB);
+    delayLayout->addWidget(delaySlid);
+
+    QHBoxLayout *generationLayout = new QHBoxLayout;
+    generationLayout->addWidget(generationLabel);
+    generationLayout->addStretch();
+    generationLayout->addWidget(numberLabel);
+    QHBoxLayout *buttonLayout = new QHBoxLayout;
+    buttonLayout->addWidget(quitButton);
+    buttonLayout->addWidget(playButton);
+    buttonLayout->addWidget(stepButton);
+    
+    QVBoxLayout *mainLayout = new QVBoxLayout;
+    mainLayout->addLayout(zoomLayout);
+    mainLayout->addLayout(delayLayout);
+    mainLayout->addLayout(generationLayout);
+    mainLayout->addLayout(buttonLayout);
     setLayout(mainLayout);
 
-    setWindowTitle(tr("Find"));
+    QString *title = new QString((name + " Controls").c_str());
+    setWindowTitle(*title);
     setFixedHeight(sizeHint().height());
 }
 
+    /*
 void optionsDialog::findClicked()
 {
+    //TODO: delete this
     QString text = lineEdit->text();
     Qt::CaseSensitivity cs = 
         caseCheckBox->isChecked() ? Qt::CaseSensitive
@@ -67,3 +122,4 @@ void optionsDialog::enableFindButton(const QString &text)
 {
     findButton->setEnabled(!text.isEmpty());
 }
+    */

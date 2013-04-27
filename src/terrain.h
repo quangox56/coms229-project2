@@ -62,6 +62,7 @@ class terrain
 
     //Getters
     char getWindowState(int x, int y);
+    color_t getWindowStateColor(int x, int y);
     string getName();
     range_t getYRange();
     range_t getXRange();

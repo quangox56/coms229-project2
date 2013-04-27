@@ -1,19 +1,55 @@
 #include <QtGui>
+#include <QTimer>
 #include "grid.h"
+#include<iostream>
+#include<cstdlib>
 
-grid::grid(QWidget *parent) : QWidget(parent)
+
+grid::grid(terrain &t, QWidget *parent) : QWidget(parent), terra(t)
 {
     setAttribute(Qt::WA_StaticContents);
     setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 
+    timer = new QTimer(this);
+    QObject::connect(timer, SIGNAL(timeout()),
+                     this, SLOT(stepClicked()));
+    
     curColor = Qt::black;
-    zoom = 4;//TODO: make zoom variable
+    zoom = 8;
 
-    image = QImage(128, 128, QImage::Format_ARGB32);//TODO: This makes it 16x16, change later for ranges
-    image.fill(qRgba(0,0,0,0));//QRgb red = qRgba(255,0,0,255);
-    optionsD = new optionsDialog(this);
+    range_t xW;
+    xW.low = 0;
+    xW.high = 32;
+    range_t yW;
+    yW.low = 0;
+    yW.high = 32;
+    t.setWXRange(xW);
+    t.setWYRange(yW);
+    image = QImage(32, 32, QImage::Format_ARGB32);//TODO: This makes it 16x16, change later for ranges
+    updateImage();
+
+    QString *title = new QString(t.getName().c_str());
+    setWindowTitle(*title);
+
+    optionsD = new optionsDialog(this, t.getName());
     optionsD->show();
     optionsD->activateWindow();
+}
+
+void grid::updateImage()
+{
+    //TODO: unhardcode this 32 later.
+    for(int y = 0; y < 32*zoom; y+=zoom)
+    {
+        for(int x = 0; x < 32*zoom; x+=zoom)
+        {
+            //std::cout << x << " " << y << std::endl;
+            QPoint pos(x, y);
+            color_t color = terra.getWindowStateColor(x/zoom, y/zoom);
+            //std::cout << "("<<x<<","<<y<<"): "<<color.r<<","<<color.g<<","<<color.b<<std::endl;
+            setImagePixel(pos, color);
+        }
+    }
 
 }
 
@@ -50,6 +86,7 @@ void grid::setZoomFactor(int newZoom)
         zoom = newZoom;
         update();
         updateGeometry();
+        resize(sizeHint());
     }
 }
 
@@ -91,6 +128,7 @@ QRect grid::pixelRect(int i, int j) const
     }
 }
 
+/*
 void grid::mousePressEvent(QMouseEvent *event)
 {
     if(event->button() == Qt::LeftButton)
@@ -114,23 +152,51 @@ void grid::mouseMoveEvent(QMouseEvent *event)
         setImagePixel(event->pos(), false);
     }
 }
+*/
 
-void grid::setImagePixel(const QPoint &pos, bool opaque)
+void grid::setImagePixel(const QPoint &pos, color_t color)
 {
     int i = pos.x() / zoom;
     int j = pos.y() / zoom;
 
     if (image.rect().contains(i,j))
     {
-        if(opaque)
-        {
-            image.setPixel(i,j, penColor().rgba());
-        }
-        else
-        {
-            image.setPixel(i, j, qRgba(0,0,0,0));
-        }
-
+        image.setPixel(i,j, qRgb(color.r, color.g, color.b));
         update(pixelRect(i,j));
+    }
+}
+
+
+void grid::stepClicked()
+{
+    terra.simulate(1);
+    updateImage();
+}
+void grid::playClicked()
+{
+    if(timer->isActive())
+    {
+        timer->stop();
+    }
+    else
+    {
+        timer->start(delay);
+    }
+}
+void grid::quitClicked()
+{
+    exit(0);
+}
+void grid::zoomChanged(int z)
+{
+    setZoomFactor(z);
+}
+void grid::delayChanged(int d)
+{
+    delay = d;
+    if(timer->isActive())
+    {
+        timer->stop();
+        timer->start(delay);
     }
 }

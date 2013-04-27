@@ -1,5 +1,5 @@
 Xrange 0 49; Yrange 0 49;Name "Gosper Glider Gun" ;Chars 32, 35;
-Colors (  100, 100,100) , (50,50,50 ) ;
+Colors (  255, 0,0) , (0,0,255) ;
 bogussssssssfda fdasfjdsklaf jkdslfa;jsdkf;lasdjfk a;sdfj ka;sjdfk ljasflkj askdljf lkajsdfk jasl;dj fklasjd fklajdsfk ;ljasdkf jalsjdf ;ljaf ;jasdkfl;j asdjf kal;sj f;l;
 Initial {
     Y=2:26;

@@ -820,3 +820,18 @@ char terrain::getWindowState(int x, int y)
         return stateChars[0];
     }
 }
+
+color_t terrain::getWindowStateColor(int x, int y)
+{
+    int wY = (wyRangeLow - yRangeLow) + (wyRangeHigh - wyRangeLow) - y;
+    int wX = wxRangeLow - xRangeLow + x;
+    if(0 <= wY && wY <= yRangeHigh-yRangeLow &&
+            0 <= wX && wX <= xRangeHigh-xRangeLow)
+    {
+        return stateColors[cells[wY][wX]];
+    }
+    else
+    {
+        return stateColors[0];
+    }
+}

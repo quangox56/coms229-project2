@@ -16,17 +16,7 @@
 #include"../terrain.h"
 #include"../common.h"
 
-struct winParam
-{
-    int delay;
-    range_t wxRange;
-    range_t wyRange;
-    terrain terra;
-    int col;
-    int row;
-    int currentGen;
-    bool playing;
-};
+
 
 int main(int argc, char *argv[])
 {
@@ -48,20 +38,19 @@ int main(int argc, char *argv[])
         exit(0);
     }
 
-    int generations = 0;
     range_t txRange;
     range_t tyRange;
 
-    winParam wp;//terra is latin for earth :)
+    terrain terra;
     if(txFlag)
     {
         txRange = getRange(argvString,"-tx");
-        wp.terra.setXRange(txRange);
+        terra.setXRange(txRange);
     }
     if(tyFlag)
     {
         tyRange = getRange(argvString,"-ty");
-        wp.terra.setYRange(tyRange);
+        terra.setYRange(tyRange);
     }
 
     string filename = getInputFileName(argvString);
@@ -69,12 +58,12 @@ int main(int argc, char *argv[])
     {
         ifstream inputFile;
         inputFile.open(filename.c_str());
-        inputFile >> wp.terra;
+        inputFile >> terra;
         inputFile.close();
     }
     else
     {
-        cin >> wp.terra;
+        cin >> terra;
     }
 
 
@@ -107,7 +96,7 @@ int main(int argc, char *argv[])
     */
     QApplication app(argc, argv);
     //optionsDialog *dialog = new optionsDialog;
-    grid *dialog = new grid;
+    grid *dialog = new grid(terra);
     dialog->show();
 
 //    optionsDialog *dialog2 = new optionsDialog(dialog);
