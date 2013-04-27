@@ -13,19 +13,17 @@ grid::grid(terrain &t, QWidget *parent) : QWidget(parent), terra(t)
     timer = new QTimer(this);
     QObject::connect(timer, SIGNAL(timeout()),
                      this, SLOT(stepClicked()));
+
+    generation = 0;
     
     curColor = Qt::black;
-    zoom = 8;
+    zoom = 1;
+    t.setWXRange(t.getXRange());
+    t.setWYRange(t.getYRange());
 
-    range_t xW;
-    xW.low = 0;
-    xW.high = 32;
-    range_t yW;
-    yW.low = 0;
-    yW.high = 32;
-    t.setWXRange(xW);
-    t.setWYRange(yW);
-    image = QImage(32, 32, QImage::Format_ARGB32);//TODO: This makes it 16x16, change later for ranges
+    xRange = t.getWXRange();
+    yRange = t.getWYRange();
+    image = QImage(xRange.high-xRange.low, yRange.high-yRange.low, QImage::Format_ARGB32);//TODO: This makes it 16x16, change later for ranges
     updateImage();
 
     QString *title = new QString(t.getName().c_str());
@@ -39,9 +37,9 @@ grid::grid(terrain &t, QWidget *parent) : QWidget(parent), terra(t)
 void grid::updateImage()
 {
     //TODO: unhardcode this 32 later.
-    for(int y = 0; y < 32*zoom; y+=zoom)
+    for(int y = 0; y < (yRange.high-yRange.low)*zoom; y+=zoom)
     {
-        for(int x = 0; x < 32*zoom; x+=zoom)
+        for(int x = 0; x < (xRange.high-xRange.low)*zoom; x+=zoom)
         {
             //std::cout << x << " " << y << std::endl;
             QPoint pos(x, y);
@@ -170,6 +168,7 @@ void grid::setImagePixel(const QPoint &pos, color_t color)
 void grid::stepClicked()
 {
     terra.simulate(1);
+    optionsD->setGen(++generation);
     updateImage();
 }
 void grid::playClicked()

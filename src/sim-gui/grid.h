@@ -46,6 +46,8 @@ class grid: public QWidget
     void setImagePixel(const QPoint &pos, color_t color);
     QRect pixelRect(int i, int j) const;
 
+    range_t xRange;
+    range_t yRange;
     terrain &terra;
     QColor curColor;
     QImage image;

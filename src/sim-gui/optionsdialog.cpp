@@ -1,6 +1,7 @@
 #include <QString>
 #include <QtGui>
 #include "optionsdialog.h"
+#include <sstream>
 
 optionsDialog::optionsDialog(QWidget *parent, std::string name)
     : QDialog(parent)
@@ -98,6 +99,13 @@ optionsDialog::optionsDialog(QWidget *parent, std::string name)
     QString *title = new QString((name + " Controls").c_str());
     setWindowTitle(*title);
     setFixedHeight(sizeHint().height());
+}
+
+void optionsDialog::setGen(int g)
+{
+    std::ostringstream convert;
+    convert << g;
+    numberLabel->setText(convert.str().c_str());
 }
 
     /*

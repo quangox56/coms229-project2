@@ -806,6 +806,22 @@ range_t terrain::getXRange()
     return returnRange;
 }
 
+range_t terrain::getWXRange()
+{
+    range_t returnRange;
+    returnRange.high = wxRangeHigh;
+    returnRange.low = wxRangeLow;
+    return returnRange;
+}
+
+range_t terrain::getWYRange()
+{
+    range_t returnRange;
+    returnRange.high = wyRangeHigh;
+    returnRange.low = wyRangeLow;
+    return returnRange;
+}
+
 char terrain::getWindowState(int x, int y)
 {
     int wY = (wyRangeLow - yRangeLow) + (wyRangeHigh - wyRangeLow) - y;

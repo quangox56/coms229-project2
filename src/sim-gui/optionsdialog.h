@@ -18,6 +18,7 @@ class optionsDialog : public QDialog
 
     public:
         optionsDialog(QWidget *parent =0, std::string name="");
+        void setGen(int g);
 
     signals:
         void findNext(const QString &str, Qt::CaseSensitivity cs);
