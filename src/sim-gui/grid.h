@@ -13,21 +13,15 @@
 class grid: public QWidget
 {
     Q_OBJECT
-    Q_PROPERTY(QColor penColor READ penColor WRITE setPenColor)
-    Q_PROPERTY(QImage iconImage READ iconImage WRITE setIconImage)
     Q_PROPERTY(int zoomFactor READ zoomFactor WRITE setZoomFactor)
 
     public:
     grid(terrain& t, QWidget *parent = 0);
     void updateImage();
 
-    void setPenColor(const QColor &newColor);
-    QColor penColor() const { return curColor; }
 
     void setZoomFactor(int newZoom);
     int zoomFactor() const { return zoom; }
-    void setIconImage(const QImage &newImage);
-    QImage iconImage() const { return image;}
     QSize sizeHint() const;
 
     public slots:
@@ -38,8 +32,6 @@ class grid: public QWidget
         void delayChanged(int);
 
     protected:
-    //void mousePressEvent(QMouseEvent *event);
-    //void mouseMoveEvent(QMouseEvent *event);
     void paintEvent(QPaintEvent *event);
 
     private:
@@ -49,7 +41,6 @@ class grid: public QWidget
     range_t xRange;
     range_t yRange;
     terrain &terra;
-    QColor curColor;
     QImage image;
     int zoom;
     int generation;
@@ -58,7 +49,6 @@ class grid: public QWidget
     range_t wyRange;
     QTimer *timer;
     
-
     optionsDialog *optionsD;
 };
 

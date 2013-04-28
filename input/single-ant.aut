@@ -1,0 +1,9 @@
+Xrange 0 40;
+Yrange 0 40;
+Name "simple ant";
+Rules LangtonsAnt;
+
+Initial {
+State 6;
+Y = 20 : 20;
+};

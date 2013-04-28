@@ -1,4 +1,8 @@
 #include"terrain.h"
+#include"conwaysGOL.h"
+#include"briansBrain.h"
+#include"wireWorld.h"
+#include"langtonsAnts.h"
 
 using namespace std;
 
@@ -205,6 +209,9 @@ ostream& operator<<(ostream& out, terrain& cT)
         out << "Yrange " << cT.wyRangeLow << " " << cT.wyRangeHigh << ";" << endl;
         out << "Initial {" << endl;
 
+        cell curState = STATE1;
+
+        bool firstY = true;
         for(int y = (cT.wyRangeLow - cT.yRangeLow) + (cT.wyRangeHigh - cT.wyRangeLow); 
             y >= cT.wyRangeLow - cT.yRangeLow;
             y--)
@@ -217,11 +224,12 @@ ostream& operator<<(ostream& out, terrain& cT)
                 if(0 <= y && y <= cT.yRangeHigh-cT.yRangeLow &&
                         0 <= x && x <= cT.xRangeHigh-cT.xRangeLow)
                 {
-                    if(cT.cells[y][x] == ALIVE)
+                    if(cT.cells[y][x] == curState)
                     {
                         if(firstX)
                         {
                             out << "Y = " << y << " : ";
+                            firstY = false;
                             out << x;
                             firstX = false;
                         }
@@ -229,6 +237,18 @@ ostream& operator<<(ostream& out, terrain& cT)
                         {
                             out << "," << x;
                         }
+                    }
+                    else if(cT.cells[y][x] != STATE0)
+                    {
+                        curState = cT.cells[y][x];
+                        if(!firstY)
+                        {
+                            out << ';' << endl;
+                        }
+                        out << "State " << (int)curState << ";" << endl;
+                        out << "Y = " << y << " : ";
+                        firstY = false;
+                        out << x;
                     }
                 }
             }
@@ -255,7 +275,7 @@ ostream& operator<<(ostream& out, terrain& cT)
                 if(0 <= y && y <= cT.yRangeHigh-cT.yRangeLow &&
                    0 <= x && x <= cT.xRangeHigh-cT.xRangeLow)
                 {
-                    out << (cT.cells[y][x] ? cT.stateChars[1]:cT.stateChars[0]);
+                    out << cT.stateChars[cT.cells[y][x]];
                 }
                 else
                 {
@@ -353,8 +373,55 @@ void terrain::handleKeyword(istringstream& iss, string keyword)
                 //Else put whatever we took out of the stream back.
                 //and continue processing.
                 iss.unget();
+
+                cell curState = STATE1;//default to state1
+                
                 while(1)
                 {
+                    char stateStr[5];
+                    if(!(iss >> stateStr[0]))
+                    {
+                        exitWithErr("There was an error in the Initial statement.");
+                    }
+
+                    if(stateStr[0] == 'S')
+                    {
+                        for(int i = 1; i < 5; i++)
+                        {
+                            if(!(iss >> stateStr[i]))
+                            {
+                                exitWithErr("There was an error in the Initial statement.");
+                            }
+                        }
+                        if(stateStr[0] == 'S' &&
+                                stateStr[1] == 't' &&
+                                stateStr[2] == 'a' &&
+                                stateStr[3] == 't' &&
+                                stateStr[4] == 'e')
+                        {
+                            int state = -1;
+                            char semicolon;
+                            if(!(iss >> state) ||
+                                    !(iss >> semicolon))
+                            {
+                                exitWithErr("There was an error in the Initial statement.");
+                            }
+                            if(semicolon != ';')
+                            {
+                                exitWithErr("There was an error in the Initial statement.");
+                            }
+                            //TODO: throw error if state is invlid
+                            curState = (cell)state;
+                        }
+                        else
+                        {
+                            exitWithErr("There was an error in the Initial statement.");
+                        }
+                    }
+                    else
+                    {
+                        iss.unget();
+                    }
                     //parse the Y value
                     if((!(iss>>Y) || !(iss>>equals) || !(iss>>y) || !(iss>>colon)))
                     {
@@ -385,7 +452,7 @@ void terrain::handleKeyword(istringstream& iss, string keyword)
                             if(y >=yRangeLow && y <= yRangeHigh &&
                                     x >=xRangeLow && x <= xRangeHigh)
                             {
-                                cells[y-yRangeLow][x-xRangeLow] = ALIVE;
+                                cells[y-yRangeLow][x-xRangeLow] = curState;
                             }
                         }
                     }while(comma != ';');
@@ -583,6 +650,53 @@ void terrain::handleKeyword(istringstream& iss, string keyword)
             exitWithErr("There was an error in the Colors statement.");
         }
     }
+    else if(keyword == "Rules")
+    {
+        string rules;
+        if(!(iss >> rules))
+        {
+           exitWithErr("There was an error in the Rules statement.");
+        }
+
+        if(rules.find(";", 0) != string::npos)
+        {
+            rules = rules.substr(0, rules.length()-1);
+        }
+        else
+        {
+            char semicolon;
+            if(!(iss >> semicolon))
+            {
+                exitWithErr("There was an error in the Rules statement.");
+            }
+            if(semicolon != ';')
+            {
+                exitWithErr("There was an error in the Rules statement.");
+            }
+        }
+
+        delete sim;
+        if(rules == "ConwaysLife")
+        {
+            sim = new conwaysGOL(*this);
+        }
+        else if(rules == "BriansBrain")
+        {
+            sim = new briansBrain(*this);
+        }
+        else if(rules == "WireWorld")
+        {
+            sim = new wireWorld(*this);
+        }
+        else if(rules == "LangtonsAnt")
+        {
+            sim = new langtonsAnts(*this);
+        }
+        else
+        {
+           exitWithErr("There was an error in the Rules statement.");
+        }
+    }
     else
     {
         cerr << "Shouldnt reach here, unhandled keyword passed.\n";
@@ -591,6 +705,9 @@ void terrain::handleKeyword(istringstream& iss, string keyword)
 
 terrain::terrain()
 {
+
+    sim = new conwaysGOL(*this);
+
     isValid = false;
     printAut = false;
     xRangeSet = false;
@@ -662,7 +779,13 @@ terrain::terrain()
     stateColors[9].g = 0;
     stateColors[9].b = 255;
 }
+
+terrain::~terrain()
+{
+    delete sim;
+}
     
+
 void terrain::setYRange(range_t yRange)
 {
     yRangeLow = yRange.low;
@@ -698,35 +821,18 @@ void terrain::setPrintModeAut(bool _printAut)
 
 void terrain::simulate(int cycles)
 {
-
-    while(cycles > 0)
-    {
-        vector< vector<cell> > tmpCells(cells);
-        for(int y = 0; 
-            y <= (yRangeHigh-yRangeLow);
-            y++)
-        {
-            for(int x = 0; 
-                    x <= (xRangeHigh-xRangeLow);
-                    x++)
-            {
-                if(0 <= y && y <= cells.size())
-                {
-                    if(0 <= x && x <= cells[y].size())
-                    {
-                        tmpCells[y][x] = getNextState(x,y);
-                    }
-                }
-            }
-        }
-        cycles--;
-        cells.assign(tmpCells.begin(), tmpCells.end());
-    }
+    sim->simulate(cycles);
 }
 
-int terrain::numberOfLiveNeighbors(int x, int y)
+neighbors_t terrain::neighborInfo(int x, int y)
 {
-    int liveNeighbors = 0;
+    neighbors_t nearby;
+    //initialize neighbors to 0
+    for(int i = 0; i < 10; i ++)
+    {
+        nearby.neighbors[i] = 0;
+    }
+
     for(int i = y-1; i <= y+1; i++)
     {
         for(int j = x-1; j <= x+1; j++)
@@ -738,52 +844,15 @@ int terrain::numberOfLiveNeighbors(int x, int y)
                 //The cell can't be it's own neighbor
                 if(!(i == y && x == j))
                 {
-                    liveNeighbors += cells[i][j];
+                    nearby.neighbors[cells[i][j]] += 1;
                 }
             }
         }
     }
 
-    return liveNeighbors;
+    return nearby;
 }
 
-cell terrain::getNextState(int x, int y)
-{
-    int liveNeighbors = numberOfLiveNeighbors(x, y);
-
-    cell returnState;
-
-    if(cells[y][x] == ALIVE)
-    {
-        if(liveNeighbors == 2 || liveNeighbors == 3)
-        {
-            returnState = ALIVE;
-        }
-        else
-        {
-            returnState = DEAD;
-        }
-    }
-    else//Cell is dead
-    {
-        if(liveNeighbors == 3)
-        {
-            returnState = ALIVE;
-        }
-        else
-        {
-            returnState = DEAD;
-        }
-    }
-
-    return returnState;
-}
-
-char getWindowState(int x, int y)
-{
-    //TODO: placeholder, implement this to return the window adjusted coordinates.
-    return 'F';
-}
 
 string terrain::getName()
 {
@@ -851,3 +920,5 @@ color_t terrain::getWindowStateColor(int x, int y)
         return stateColors[0];
     }
 }
+
+terrain::simulator::simulator(terrain& owner) : t(owner) {}

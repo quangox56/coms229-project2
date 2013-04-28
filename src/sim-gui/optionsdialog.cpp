@@ -6,28 +6,6 @@
 optionsDialog::optionsDialog(QWidget *parent, std::string name)
     : QDialog(parent)
 {
-    /*
-    label = new QLabel(tr("Find &what:"));
-    lineEdit = new QLineEdit;
-    label->setBuddy(lineEdit);
-
-    caseCheckBox = new QCheckBox(tr("Match &case"));
-    backwardCheckBox = new QCheckBox(tr("Search &backward"));
-
-    findButton = new QPushButton(tr("&Find"));
-    findButton->setDefault(true);
-    findButton->setEnabled(false);
-
-    closeButton = new QPushButton(tr("Close"));
-
-    connect(lineEdit, SIGNAL(textChanged(const QString&)),
-            this, SLOT(enableFindButton(const QString&)));
-    connect(findButton, SIGNAL(clicked()),
-            this, SLOT(findClicked()));
-    connect(closeButton, SIGNAL(clicked()),
-            this, SLOT(close()));
-            */
-
     zoomLabel = new QLabel(tr("Zoom factor"));
     delayLabel = new QLabel(tr("Delay factor"));
     generationLabel = new QLabel(tr("Generation:"));
@@ -107,27 +85,3 @@ void optionsDialog::setGen(int g)
     convert << g;
     numberLabel->setText(convert.str().c_str());
 }
-
-    /*
-void optionsDialog::findClicked()
-{
-    //TODO: delete this
-    QString text = lineEdit->text();
-    Qt::CaseSensitivity cs = 
-        caseCheckBox->isChecked() ? Qt::CaseSensitive
-        : Qt::CaseInsensitive;
-    if(backwardCheckBox->isChecked())
-    {
-        emit findPrevious(text, cs);
-    }
-    else
-    {
-        emit findNext(text, cs);
-    } 
-}
-
-void optionsDialog::enableFindButton(const QString &text)
-{
-    findButton->setEnabled(!text.isEmpty());
-}
-    */

@@ -9,11 +9,11 @@
 #include <iterator>
 #include<vector>
 
-#define NUM_KEYWORDS 6
+#define NUM_KEYWORDS 7
 #define REQ_KEYWORDS 3 //Only Xrange, Yrange, and Initial are required in an aut
-#define KEYWORDS {"Xrange", "Yrange", "Initial", "Name", "Chars", "Colors"}
+#define KEYWORDS {"Xrange", "Yrange", "Initial", "Name", "Chars", "Colors", "Rules"}
 
-enum cell {DEAD, ALIVE};
+enum cell {STATE0, STATE1, STATE2, STATE3, STATE4, STATE5, STATE6, STATE7, STATE8, STATE9};
 
 struct range_t
 {
@@ -26,6 +26,13 @@ struct color_t
     int r;
     int g;
     int b;
+};
+
+struct neighbors_t
+{
+    //This array is indexed by the cell type to convey number of neighbors
+    //eg: number of neighbors that are in state 0 is stored in neighbor[STATE0]
+    int neighbors[10];
 };
 
 void exitWithErr(std::string error);

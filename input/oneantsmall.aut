@@ -1,0 +1,9 @@
+Xrange -1 1;
+Yrange -1 1;
+Name "one ant";
+Rules LangtonsAnt;
+
+Initial {
+  State 2;
+  Y = 0 : 0;
+};

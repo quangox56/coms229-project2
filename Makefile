@@ -1,16 +1,37 @@
 all: showgen sim-tui
 
-showgen: showgen.o terrain.o common.o
+showgen: showgen.o terrain.o common.o conwaysGOL.o briansBrain.o wireWorld.o langtonsAnts.o
 	mkdir -p bin
-	g++ -g obj/showgen.o obj/terrain.o obj/common.o -o bin/showgen 
+	g++ -g obj/showgen.o obj/terrain.o obj/common.o obj/conwaysGOL.o obj/briansBrain.o obj/wireWorld.o obj/langtonsAnts.o -o bin/showgen 
 
-sim-tui: sim-tui.o terrain.o common.o
+sim-tui: sim-tui.o terrain.o common.o conwaysGOL.o briansBrain.o wireWorld.o langtonsAnts.o
 	mkdir -p bin
-	g++ -g obj/sim-tui.o obj/terrain.o obj/common.o -lncurses -o bin/sim-tui
+	g++ -g obj/sim-tui.o obj/terrain.o obj/common.o obj/conwaysGOL.o obj/briansBrain.o obj/wireWorld.o obj/langtonsAnts.o -lncurses -o bin/sim-tui
+
+sim-gui: src/sim-gui/sim-gui.cpp src/sim-gui/grid.cpp src/sim-gui/optionsdialog.cpp
+	mkdir -p bin
+	make -f src/sim-gui/Makefile
+	cp src/sim-gui/sim-gui ./bin/
 
 terrain.o: src/terrain.cpp src/terrain.h
 	mkdir -p obj
 	g++ -c -g src/terrain.cpp -o obj/terrain.o
+
+conwaysGOL.o: src/conwaysGOL.cpp src/conwaysGOL.h
+	mkdir -p obj
+	g++ -c -g src/conwaysGOL.cpp -o obj/conwaysGOL.o
+
+briansBrain.o: src/briansBrain.cpp src/briansBrain.h
+	mkdir -p obj
+	g++ -c -g src/briansBrain.cpp -o obj/briansBrain.o
+
+wireWorld.o: src/wireWorld.cpp src/wireWorld.h
+	mkdir -p obj
+	g++ -c -g src/wireWorld.cpp -o obj/wireWorld.o
+	
+langtonsAnts.o: src/langtonsAnts.cpp src/langtonsAnts.h
+	mkdir -p obj
+	g++ -c -g src/langtonsAnts.cpp -o obj/langtonsAnts.o
 
 showgen.o: src/showgen.cpp 
 	mkdir -p obj
