@@ -1,0 +1,12 @@
+Xrange -50 50;
+Yrange -50 50;
+Name "Brians Explosion";
+Rules BriansBrain;
+
+Initial {
+  State 2;
+  Y = 0 : 0;
+  Y = 0 : 1;
+  Y = -1 : 0;
+  Y = -1 : 1;
+};
