@@ -268,11 +268,12 @@ int main(int argc, char** argv)
     else
     {
         cin >> wp.terra;
+        freopen("/dev/tty", "rw", stdin);
     }
 
     initDisplay(wp);
 
-    wp.delay = 100; //Default the delay to 100ms TODO: add keypresses to change delay
+    wp.delay = 100; 
     wp.currentGen = 0;
     wp.playing = false;
     range_t xRange = wp.terra.getXRange();

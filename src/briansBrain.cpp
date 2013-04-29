@@ -2,7 +2,11 @@
 #include"common.h"
 #include<vector>
 
-briansBrain::briansBrain(terrain& owner) : simulator(owner) {}
+briansBrain::briansBrain(terrain& owner) : simulator(owner) 
+{
+    name = "BriansBrain";
+    numStates = 3;
+}
 
 void briansBrain::simulate(int cycles)
 {

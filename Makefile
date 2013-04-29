@@ -1,4 +1,4 @@
-all: showgen sim-tui
+all: showgen sim-tui sim-gui
 
 showgen: showgen.o terrain.o common.o conwaysGOL.o briansBrain.o wireWorld.o langtonsAnts.o
 	mkdir -p bin
@@ -8,10 +8,11 @@ sim-tui: sim-tui.o terrain.o common.o conwaysGOL.o briansBrain.o wireWorld.o lan
 	mkdir -p bin
 	g++ -g obj/sim-tui.o obj/terrain.o obj/common.o obj/conwaysGOL.o obj/briansBrain.o obj/wireWorld.o obj/langtonsAnts.o -lncurses -o bin/sim-tui
 
-sim-gui: src/sim-gui/sim-gui.cpp src/sim-gui/grid.cpp src/sim-gui/optionsdialog.cpp
+sim-gui: src/sim-gui/sim-gui.cpp src/sim-gui/grid.cpp src/sim-gui/optionsdialog.cpp terrain.o common.o conwaysGOL.o briansBrain.o wireWorld.o langtonsAnts.o
 	mkdir -p bin
-	make -f src/sim-gui/Makefile
-	cp src/sim-gui/sim-gui ./bin/
+	cd src/sim-gui; qmake-qt4 -project; qmake-qt4 sim-gui.pro; make
+	mv src/sim-gui/sim-gui ./bin/
+	rm -f src/sim-gui/*.o
 
 terrain.o: src/terrain.cpp src/terrain.h
 	mkdir -p obj
@@ -51,6 +52,9 @@ clean:
 	rm -f core.*
 	rm -rf test/generatedaut
 	rm -rf test/showgenoutput
+	rm -f src/sim-gui/moc_*
+	rm -f src/sim-gui/Makefile
+	rm -f src/sim-gui/sim-gui.pro
 
 test: all
 	python test/fuzzy.py test bin

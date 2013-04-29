@@ -31,6 +31,7 @@ class terrain
 
         string name;
 
+        bool keywordsFound[NUM_KEYWORDS];
         bool xRangeSet;
         bool yRangeSet;
         bool wxRangeSet;
@@ -74,6 +75,8 @@ class terrain
         class simulator
         {
             public:
+                string name;
+                int numStates;
                 simulator(terrain& owner);
                 virtual void simulate(int cycles) = 0;
             protected:
@@ -89,6 +92,8 @@ class terrain
 
     private:
         simulator* sim;
+
+
 
 };
 #endif

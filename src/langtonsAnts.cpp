@@ -2,7 +2,11 @@
 #include"common.h"
 #include<vector>
 
-langtonsAnts::langtonsAnts(terrain& owner) : simulator(owner) {}
+langtonsAnts::langtonsAnts(terrain& owner) : simulator(owner) 
+{
+    name = "LangtonsAnt";
+    numStates = 10;
+}
 
 void langtonsAnts::simulate(int cycles)
 {

@@ -22,7 +22,7 @@ grid::grid(terrain &t, QWidget *parent) : QWidget(parent), terra(t)
 
     xRange = t.getWXRange();
     yRange = t.getWYRange();
-    image = QImage(xRange.high-xRange.low, yRange.high-yRange.low, QImage::Format_ARGB32);
+    image = QImage(xRange.high-xRange.low+1, yRange.high-yRange.low+1, QImage::Format_ARGB32);
     updateImage();
 
     QString *title = new QString(t.getName().c_str());
@@ -35,9 +35,9 @@ grid::grid(terrain &t, QWidget *parent) : QWidget(parent), terra(t)
 
 void grid::updateImage()
 {
-    for(int y = 0; y < (yRange.high-yRange.low)*zoom; y+=zoom)
+    for(int y = 0; y < (yRange.high-yRange.low+1)*zoom; y+=zoom)
     {
-        for(int x = 0; x < (xRange.high-xRange.low)*zoom; x+=zoom)
+        for(int x = 0; x < (xRange.high-xRange.low+1)*zoom; x+=zoom)
         {
             QPoint pos(x, y);
             color_t color = terra.getWindowStateColor(x/zoom, y/zoom);

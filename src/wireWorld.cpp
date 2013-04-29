@@ -2,7 +2,11 @@
 #include"common.h"
 #include<vector>
 
-wireWorld::wireWorld(terrain& owner) : simulator(owner) {}
+wireWorld::wireWorld(terrain& owner) : simulator(owner) 
+{
+    name = "WireWorld";
+    numStates = 4;
+}
 
 void wireWorld::simulate(int cycles)
 {

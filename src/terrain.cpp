@@ -112,11 +112,9 @@ istream& operator>>(istream& in, terrain& cT)
         }
     }
 
-    
+    string keywords[NUM_KEYWORDS] = KEYWORDS;
     //use an istringstream to parse the statements with whitespace delimiting
     istringstream* iss = new istringstream(autFileStatements[0]);
-    string keywords[NUM_KEYWORDS] = KEYWORDS;
-    bool keywordsFound[NUM_KEYWORDS];
     for(int i = 0; i < semicolonCount; i++)
     {
         string tmp;
@@ -160,7 +158,7 @@ istream& operator>>(istream& in, terrain& cT)
                         iss = new istringstream(cmpdStatement);
                     }
                     keywordFound = true;
-                    keywordsFound[j] = true;
+                    cT.keywordsFound[j] = true;
                 }
             }
         }
@@ -180,7 +178,7 @@ istream& operator>>(istream& in, terrain& cT)
     //Check that all required keywords were found.
     for(int i = 0; i < REQ_KEYWORDS; i++)
     {
-        if(!keywordsFound[i])
+        if(!cT.keywordsFound[i])
         {
             exitWithErr("Error: Not all required keywords found in .aut file.");
         }
@@ -207,6 +205,37 @@ ostream& operator<<(ostream& out, terrain& cT)
     {
         out << "Xrange " << cT.wxRangeLow << " " << cT.wxRangeHigh << ";" << endl;
         out << "Yrange " << cT.wyRangeLow << " " << cT.wyRangeHigh << ";" << endl;
+        out << "Rules " << cT.sim->name << ";" << endl;
+
+        if(cT.name.length() > 0)
+        {
+            out << "Name \"" << cT.name << "\";" << endl;
+        }
+
+        out << "Chars ";
+        for(int i = 0; i < cT.sim->numStates; i++)
+        {
+            if(i != 0)
+            {
+                out << ',';
+            }
+            out << (int)cT.stateChars[i];
+        }
+        out << ';' << endl;
+
+        out << "Colors ";
+        for(int i = 0; i < cT.sim->numStates; i++)
+        {
+            if(i != 0)
+            {
+                out << ',';
+            }
+            out << "(" << cT.stateColors[i].r 
+                << "," << cT.stateColors[i].g 
+                << "," << cT.stateColors[i].b << ")";
+        }
+        out << ';' << endl;
+        
         out << "Initial {" << endl;
 
         cell curState = STATE1;
@@ -334,6 +363,15 @@ void terrain::handleKeyword(istringstream& iss, string keyword)
     }
     else if(keyword == "Initial")
     {
+        //Check that Xrange and Yrange were processed already.
+        for(int i = 0; i < REQ_KEYWORDS-1; i++)
+        {
+            if(!keywordsFound[i])
+            {
+                exitWithErr("Missing required keywords before Intitial statement.");
+            }
+        }
+        
         char leftBracket;
         char Y;
         char equals;
@@ -410,8 +448,15 @@ void terrain::handleKeyword(istringstream& iss, string keyword)
                             {
                                 exitWithErr("There was an error in the Initial statement.");
                             }
-                            //TODO: throw error if state is invlid
-                            curState = (cell)state;
+
+                            if(0 <= state && state < sim->numStates)
+                            {
+                                curState = (cell)state;
+                            }
+                            else
+                            {
+                                exitWithErr("State declared that is outside rules scope.");
+                            }
                         }
                         else
                         {
@@ -508,13 +553,14 @@ void terrain::handleKeyword(istringstream& iss, string keyword)
             }
             if(asciiHolder >= 0 && asciiHolder <= 255)
             {
-                if(charIndex < 10)//There is a max of 10 possible states with langston's ants
+                if(charIndex < sim->numStates)//There is a max of 10 possible states with langston's ants
                 {
                     stateChars[charIndex] = asciiHolder;
                 }
                 else
                 {
                     cerr << "Warning: this aut file has more chars than states." << endl;
+                    comma = ';';
                 }
             }
             else
@@ -626,14 +672,20 @@ void terrain::handleKeyword(istringstream& iss, string keyword)
                     colorToRead.g < 0 || colorToRead.g > 255 ||  
                     colorToRead.b < 0 || colorToRead.b > 255)
             {
-                exitWithErr("There was an error in the Colors statement.");
+                exitWithErr("Color values must range from 0 to 255.");
             }
 
             //Add the color we just read to the stored colors variable
-            if(colorIndex < 10)//Max amount of colors we have to deal with is 10
+            if(colorIndex < sim->numStates)//Max amount of colors we have to deal with is 10
             {
                 stateColors[colorIndex] = colorToRead;
                 colorIndex++;
+            }
+            else
+            {
+                cerr << "Warning: this aut file has more colors than states." << endl;
+                readChar = ';';
+                break;
             }
 
             //if this char is a comma we have another color value to read
@@ -652,6 +704,11 @@ void terrain::handleKeyword(istringstream& iss, string keyword)
     }
     else if(keyword == "Rules")
     {
+        if(keywordsFound[2] || keywordsFound[4] || keywordsFound[5])
+        {
+            exitWithErr("The rules keyword must come before Chars, Colors, and Initial keywords.");
+        }
+
         string rules;
         if(!(iss >> rules))
         {
@@ -699,7 +756,16 @@ void terrain::handleKeyword(istringstream& iss, string keyword)
     }
     else
     {
-        cerr << "Shouldnt reach here, unhandled keyword passed.\n";
+        //if we got here that means the helper function got something like
+        //Name; as input which is an invalid use of the Name keyword.
+        string keywords[NUM_KEYWORDS] = KEYWORDS;
+        for(int j = 0; j < NUM_KEYWORDS; j++)
+        {
+            if(keyword.find(keywords[j]) != string::npos)
+            {
+                exitWithErr("There was an error in the " + keywords[j] + " statement.");
+            }
+        }
     }
 }
 
@@ -716,6 +782,12 @@ terrain::terrain()
     wyRangeSet = false;
     stateChars.resize(10);//There is a max of 10 states with langton's ants
     stateColors.resize(10);
+
+    //Initialize the keywords found array to false
+    for(int i = 0; i < NUM_KEYWORDS; i++)
+    {
+        keywordsFound[i] = false;
+    }
 
     //Setting default states
     stateChars[0] = '~';
@@ -821,7 +893,14 @@ void terrain::setPrintModeAut(bool _printAut)
 
 void terrain::simulate(int cycles)
 {
-    sim->simulate(cycles);
+    if(isValid)
+    {
+        sim->simulate(cycles);
+    }
+    else
+    {
+        cerr << "Warning: attempted to simulate before loading terrain." << endl;
+    }
 }
 
 neighbors_t terrain::neighborInfo(int x, int y)
