@@ -40,7 +40,6 @@ istream& operator>>(istream& in, terrain& cT)
         lastFound = found;
         index++;
     }
-    //autFileLines[index] = autFile.substr(lastFound);
 
     int semicolonCount = 0;
     found = 0;
@@ -88,7 +87,6 @@ istream& operator>>(istream& in, terrain& cT)
                 found++;
                 lastFound = found;
             }
-            //autFileStatements[index] += autFileLines[i].substr(lastFound);
         } 
         else//there was no semicolon, add the entire line to the statement.
         {
@@ -101,7 +99,7 @@ istream& operator>>(istream& in, terrain& cT)
     //Trim any beginning whitespace, this can screw up later parsing.
     for(int i = 0; i < semicolonCount; i++)
     {
-        while(autFileStatements[i][0] == ' ' || 
+        while(autFileStatements[i][0] == ' '  || 
               autFileStatements[i][0] == '\n' || 
               autFileStatements[i][0] == '\t' || 
               autFileStatements[i][0] == '\v' || 
@@ -117,13 +115,14 @@ istream& operator>>(istream& in, terrain& cT)
     istringstream* iss = new istringstream(autFileStatements[0]);
     for(int i = 0; i < semicolonCount; i++)
     {
-        string tmp;
+        string keyword;
         bool keywordFound = false;
-        (*iss) >> tmp;
+        (*iss) >> keyword;
+        //loop through all valid keywords and compare to see if this is a valid keyword
         for(int j = 0; j < NUM_KEYWORDS; j++)
         {
             found = 0;
-            if((found = tmp.find(keywords[j])) != string::npos)
+            if((found = keyword.find(keywords[j])) != string::npos)
             {
                 if(found == 0)//Keyword must be at the start of the statement
                 {
@@ -131,8 +130,10 @@ istream& operator>>(istream& in, terrain& cT)
                     {
                         delete iss;
                         string cmpdStatement = autFileStatements[i];
+                        //If the statement didn't have the closing bracket
                         if(autFileStatements[i].find("}") == string::npos)
                         {
+                            //add all statements until we find the closing bracket
                             while(autFileStatements[i].find("}") == string::npos)
                             {
                                 if(i < semicolonCount)
@@ -154,7 +155,37 @@ istream& operator>>(istream& in, terrain& cT)
 
                         //Remove the keyword from the string.
                         cmpdStatement = cmpdStatement.substr(keywords[j].length());
-                        tmp = "Initial";
+                        keyword = "Initial";
+                        iss = new istringstream(cmpdStatement);
+                    }
+                    else if(keywords[j] == "Name")//Name requires special handling because
+                    {                             //they can have semicolons inside them
+                        delete iss;
+                        string cmpdStatement = autFileStatements[i];
+                        int firstQuote = autFileStatements[i].find("\"");
+
+                        //If the first statement didn't have a closing quote
+                        if(autFileStatements[i].find("\"", firstQuote+1) == string::npos) 
+                        {
+                            i++;
+                            //Add all statements until we find the closing quote, or reach
+                            //end of statements
+                            while(autFileStatements[i].find("\"") == string::npos)
+                            {
+                                if(i < semicolonCount)
+                                {
+                                    i++;
+                                    cmpdStatement += autFileStatements[i];
+                                }
+                                else
+                                {
+                                    break;
+                                }
+                            }
+                        }
+                        //Strip the keyword from the statement
+                        cmpdStatement = cmpdStatement.substr(keywords[j].length());
+                        keyword = "Name";
                         iss = new istringstream(cmpdStatement);
                     }
                     keywordFound = true;
@@ -165,7 +196,7 @@ istream& operator>>(istream& in, terrain& cT)
         if(keywordFound)
         {
             //If a keyword was found then call the helper function
-            cT.handleKeyword(*iss, tmp);
+            cT.handleKeyword(*iss, keyword);
         }
         delete iss;
         if((i+1) < semicolonCount)
@@ -240,7 +271,6 @@ ostream& operator<<(ostream& out, terrain& cT)
 
         cell curState = STATE1;
 
-        bool firstY = true;
         for(int y = (cT.wyRangeLow - cT.yRangeLow) + (cT.wyRangeHigh - cT.wyRangeLow); 
             y >= cT.wyRangeLow - cT.yRangeLow;
             y--)
@@ -257,27 +287,26 @@ ostream& operator<<(ostream& out, terrain& cT)
                     {
                         if(firstX)
                         {
-                            out << "Y = " << y << " : ";
-                            firstY = false;
-                            out << x;
+                            out << "Y = " << y+cT.yRangeLow << " : ";
+                            out << x+cT.xRangeLow;
                             firstX = false;
                         }
                         else
                         {
-                            out << "," << x;
+                            out << "," << x+cT.xRangeLow;
                         }
                     }
                     else if(cT.cells[y][x] != STATE0)
                     {
                         curState = cT.cells[y][x];
-                        if(!firstY)
+                        if(!firstX)
                         {
                             out << ';' << endl;
                         }
                         out << "State " << (int)curState << ";" << endl;
-                        out << "Y = " << y << " : ";
-                        firstY = false;
-                        out << x;
+                        out << "Y = " << y+cT.yRangeLow << " : ";
+                        firstX = false;
+                        out << x+cT.xRangeLow;
                     }
                 }
             }
@@ -331,6 +360,8 @@ void terrain::resizeCells(size_t newSize)
 
 void terrain::handleKeyword(istringstream& iss, string keyword)
 {
+    //This function is large, but it is split nicely into sections by this first
+    //if statement depending on the keyword input.
     if(keyword == "Xrange")
     {
         if(!xRangeSet)//If the xRange has already been set, overrule the .aut
@@ -368,7 +399,7 @@ void terrain::handleKeyword(istringstream& iss, string keyword)
         {
             if(!keywordsFound[i])
             {
-                exitWithErr("Missing required keywords before Intitial statement.");
+                exitWithErr("Missing required keywords before Initial statement.");
             }
         }
         
@@ -414,14 +445,16 @@ void terrain::handleKeyword(istringstream& iss, string keyword)
 
                 cell curState = STATE1;//default to state1
                 
-                while(1)
-                {
+                while(1) //This loop's condition is checked at the end
+                {        //with the final if statement
                     char stateStr[5];
                     if(!(iss >> stateStr[0]))
                     {
                         exitWithErr("There was an error in the Initial statement.");
                     }
 
+                    //If the first character was a capital S then it might be a state
+                    //command. If it's not a state command then it's a malformed file.
                     if(stateStr[0] == 'S')
                     {
                         for(int i = 1; i < 5; i++)
@@ -463,10 +496,11 @@ void terrain::handleKeyword(istringstream& iss, string keyword)
                             exitWithErr("There was an error in the Initial statement.");
                         }
                     }
-                    else
-                    {
+                    else//else if it wan't an S then put it back and continue with
+                    {   //normal parsing
                         iss.unget();
                     }
+
                     //parse the Y value
                     if((!(iss>>Y) || !(iss>>equals) || !(iss>>y) || !(iss>>colon)))
                     {
@@ -494,6 +528,8 @@ void terrain::handleKeyword(istringstream& iss, string keyword)
                                 exitWithErr("There was an error in the Initial statement.");
                             }
 
+                            //If it fits inside the range then store it
+                            //otherwise ignore
                             if(y >=yRangeLow && y <= yRangeHigh &&
                                     x >=xRangeLow && x <= xRangeHigh)
                             {
@@ -519,6 +555,7 @@ void terrain::handleKeyword(istringstream& iss, string keyword)
 
                     }
                 }
+
                 if(!(iss>>semicolon))
                 {
                     exitWithErr("There was an error in the Initial statement.");
@@ -546,14 +583,17 @@ void terrain::handleKeyword(istringstream& iss, string keyword)
             {
                 exitWithErr("There was an error in the Chars statement.");
             }
+
             if(!(iss >> asciiHolder) || 
                     !(iss >> comma))
             {
                 exitWithErr("There was an error in the Chars statement.");
             }
+
+            //Check to make sure the ascii value is in the range of 256
             if(asciiHolder >= 0 && asciiHolder <= 255)
             {
-                if(charIndex < sim->numStates)//There is a max of 10 possible states with langston's ants
+                if(charIndex < sim->numStates)//max number of states is determined by simulation rules
                 {
                     stateChars[charIndex] = asciiHolder;
                 }
@@ -573,8 +613,6 @@ void terrain::handleKeyword(istringstream& iss, string keyword)
     }
     else if(keyword == "Name")
     {   
-        //TODO: Handle the case of a semicolon inside the quotes.
-        //This will require some changes inside the operator>> function
         char readChar;
         if(!(iss >> readChar))
         {
@@ -585,6 +623,8 @@ void terrain::handleKeyword(istringstream& iss, string keyword)
             exitWithErr("There was an error in the Name statement.");
         }
 
+        //Have to read the name one character at a time because it can 
+        //have semicolons and spaces and other wierd things
         do
         {
             if(!(iss >> readChar))
@@ -601,7 +641,6 @@ void terrain::handleKeyword(istringstream& iss, string keyword)
         {
             exitWithErr("There was an error in the Name statement.");
         }
-
         if(readChar != ';')
         {
             exitWithErr("There was an error in the Name statement.");
@@ -676,7 +715,7 @@ void terrain::handleKeyword(istringstream& iss, string keyword)
             }
 
             //Add the color we just read to the stored colors variable
-            if(colorIndex < sim->numStates)//Max amount of colors we have to deal with is 10
+            if(colorIndex < sim->numStates)//Max amount of colors we have to deal with is determined by simulation type
             {
                 stateColors[colorIndex] = colorToRead;
                 colorIndex++;
@@ -715,12 +754,15 @@ void terrain::handleKeyword(istringstream& iss, string keyword)
            exitWithErr("There was an error in the Rules statement.");
         }
 
+        //if the rules keyword is immediately followed by a semicolon
+        //then that semicolon will accompany it in the read so we
+        //need to strip that.
         if(rules.find(";", 0) != string::npos)
         {
             rules = rules.substr(0, rules.length()-1);
         }
         else
-        {
+        {//else read and make sure the next thing is a semicolon.
             char semicolon;
             if(!(iss >> semicolon))
             {
@@ -750,7 +792,7 @@ void terrain::handleKeyword(istringstream& iss, string keyword)
             sim = new langtonsAnts(*this);
         }
         else
-        {
+        {//If they specified an invalid rule.
            exitWithErr("There was an error in the Rules statement.");
         }
     }
@@ -758,6 +800,9 @@ void terrain::handleKeyword(istringstream& iss, string keyword)
     {
         //if we got here that means the helper function got something like
         //Name; as input which is an invalid use of the Name keyword.
+        
+        //Check which keyword was meant to be passed and print a useful error
+        //specifying that keyword.
         string keywords[NUM_KEYWORDS] = KEYWORDS;
         for(int j = 0; j < NUM_KEYWORDS; j++)
         {
@@ -772,7 +817,7 @@ void terrain::handleKeyword(istringstream& iss, string keyword)
 terrain::terrain()
 {
 
-    sim = new conwaysGOL(*this);
+    sim = new conwaysGOL(*this);//Default rules is conways
 
     isValid = false;
     printAut = false;
@@ -857,7 +902,6 @@ terrain::~terrain()
     delete sim;
 }
     
-
 void terrain::setYRange(range_t yRange)
 {
     yRangeLow = yRange.low;

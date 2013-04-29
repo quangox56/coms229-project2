@@ -133,9 +133,9 @@ void updateDisplay(winParam &wp)
     
     //Draw keypress info
     mvprintw(wp.row-1, 0, "(Q)uit");
-    mvprintw(wp.row-1, (int)((wp.col-1)*(1.0/4.0)-3), "(P)lay");
-    mvprintw(wp.row-1, (int)((wp.col-1)*(3.0/4.0)-3), "(S)tep");
-    mvprintw(wp.row-1, wp.col-16, "Arrows:scroll");
+    mvprintw(wp.row-1, 8, "(P)lay");
+    mvprintw(wp.row-1, wp.col-23, "(S)tep");
+    mvprintw(wp.row-1, wp.col-13, "Arrows:scroll");
 
     //Draw Terrain
     int maxY = wp.row-5;
