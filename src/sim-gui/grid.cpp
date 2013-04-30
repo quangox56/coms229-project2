@@ -1,3 +1,12 @@
+//**********************************************************
+//  grid.cpp
+//  
+//  Author: Ryan Scheel (rascheel@iastate.edu)
+//
+//  Contains the implementation code for the grid GUI component.
+//  Refer to header file grid.h for function comments.
+//
+//**********************************************************
 #include <QtGui>
 #include <QTimer>
 #include "grid.h"

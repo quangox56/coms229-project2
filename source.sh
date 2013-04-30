@@ -1,3 +1,2 @@
 ulimit -c unlimited
-evince docs/*.pdf &
-gvim src/*.cpp src/*.h
+gvim src/*.cpp src/*.h src/sim-gui/*.cpp src/sim-gui/*.h

@@ -1,3 +1,13 @@
+//**********************************************************
+//  optionsdialog.cpp
+//  
+//  Author: Ryan Scheel (rascheel@iastate.edu)
+//
+//  Contains the implementation code for the Options Dialog GUI 
+//  component. Refer to header file optionsdialog.h for function 
+//  comments.
+//
+//**********************************************************
 #include <QString>
 #include <QtGui>
 #include "optionsdialog.h"

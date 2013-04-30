@@ -1,3 +1,11 @@
+//**********************************************************
+//  common.h
+//  
+//  Author: Ryan Scheel (rascheel@iastate.edu)
+//
+//  FILE DESCRIPTION
+//
+//**********************************************************
 #ifndef COMMON_H
 #define COMMON_H
 #include <algorithm>

@@ -1,3 +1,12 @@
+//**********************************************************
+//  briansBrain.cpp
+//    
+//  Author: Ryan Scheel (rascheel@iastate.edu)
+//
+//  Contains the code for the brians brain simulator class.
+//  Check briansBrain.h for function comments.
+//
+//**********************************************************
 #include"briansBrain.h"
 #include"common.h"
 #include<vector>

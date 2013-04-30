@@ -1,3 +1,11 @@
+//**********************************************************
+//  terrain.h
+//  
+//  Author: Ryan Scheel (rascheel@iastate.edu)
+//
+//  FILE DESCRIPTION
+//
+//**********************************************************
 #ifndef TERRAIN_H
 #define TERRAIN_H
 

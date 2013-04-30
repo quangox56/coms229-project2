@@ -1,3 +1,12 @@
+//**********************************************************
+//  common.cpp
+//  
+//  Author: Ryan Scheel (rascheel@iastate.edu)
+//
+//  Contains the code for the common functions. Check
+//  common.h for function descriptions.
+//
+//**********************************************************
 #include"common.h"
 
 using namespace std;

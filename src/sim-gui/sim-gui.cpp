@@ -1,4 +1,13 @@
-#include <QApplication>
+//**********************************************************
+//  sim-gui.cpp
+//  
+//  Author: Ryan Scheel (rascheel@iastate.edu)
+//
+//  Contains the main function for the sim-gui. This sim-gui
+//  launches the grid GUI components with the required parameters.
+//  This code also handles all required argument processing.
+//
+//**********************************************************
 #include <QScrollArea>
 #include "grid.h"
 

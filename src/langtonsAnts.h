@@ -1,3 +1,11 @@
+//**********************************************************
+//  langtonsAnts.h
+//  
+//  Author: Ryan Scheel (rascheel@iastate.edu)
+//
+//  FILE DESCRIPTION
+//
+//**********************************************************
 #ifndef LANGTONSANTS_H
 #define LANGTONSANTS_H
 #include"terrain.h"

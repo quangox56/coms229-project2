@@ -1,3 +1,11 @@
+//**********************************************************
+//  wireWorld.h
+//  
+//  Author: Ryan Scheel (rascheel@iastate.edu)
+//
+//  FILE DESCRIPTION
+//
+//**********************************************************
 #ifndef WIREWORLD_H
 #define WIREWORLD_H
 #include"terrain.h"

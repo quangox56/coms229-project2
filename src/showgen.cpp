@@ -1,3 +1,13 @@
+//**********************************************************
+//  showgen.cpp
+//  
+//  Author: Ryan Scheel (rascheel@iastate.edu)
+//
+//  Contains the main function for showgen. Instantiates the
+//  terrain class and uses it as necessary to simulate.
+//  This function also handles all required argument processing.
+//
+//**********************************************************
 #include <algorithm>
 #include <iostream>
 #include <sstream>

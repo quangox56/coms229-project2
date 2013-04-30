@@ -1,3 +1,12 @@
+//**********************************************************
+//  langtonsAnts.cpp
+//  
+//  Author: Ryan Scheel (rascheel@iastate.edu)
+//
+//  Contains the source code for the langton's ants
+//  simulator. Reference langtonsAnts.h for function comments.
+//
+//**********************************************************
 #include"langtonsAnts.h"
 #include"common.h"
 #include<vector>

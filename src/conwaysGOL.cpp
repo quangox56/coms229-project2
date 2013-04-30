@@ -1,3 +1,12 @@
+//**********************************************************
+//  conwaysGOL.cpp
+//    
+//  Author: Ryan Scheel (rascheel@iastate.edu)
+//
+//  Contains the source code for the conways game of life
+//  simulator. Reference conwaysGOL.h for function comments.
+//
+//**********************************************************
 #include"conwaysGOL.h"
 #include"common.h"
 #include<vector>

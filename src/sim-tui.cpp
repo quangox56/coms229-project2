@@ -1,3 +1,13 @@
+//**********************************************************
+//  sim-tui.cpp
+//  
+//  Author: Ryan Scheel (rascheel@iastate.edu)
+//
+//  Contains the main function for the sim-tui. This sim-tui
+//  launches the ncurses TUI with the required parameters.
+//  This code also handles all required argument processing.
+//
+//**********************************************************
 #include <algorithm>
 #include <iostream>
 #include <sstream>
@@ -11,6 +21,7 @@
 
 using namespace std;
 
+//Parameters of the ncurses window.
 struct winParam
 {
     int delay;
@@ -23,6 +34,8 @@ struct winParam
     bool playing;
 };
 
+//This struct contains bools for
+//all keys the could push and their state.
 struct keys
 {
     bool q;
@@ -36,6 +49,12 @@ struct keys
     bool minus;
 };
 
+/* Function: initDisplay
+ *
+ * This function sets up the initial settings for the
+ * ncurses window. It also checks to make sure the window
+ * is large enough.
+ */
 void initDisplay(winParam &wp)
 {
     initscr();
@@ -51,6 +70,11 @@ void initDisplay(winParam &wp)
     }
 }
 
+/* Function: updateDisplay
+ *
+ * This function is called everytime we need to redraw the window. It draws every section of
+ * the TUI and queries the terrain for cell status.
+ */
 void updateDisplay(winParam &wp)
 {
     wp.terra.setWYRange(wp.wyRange);
@@ -151,6 +175,10 @@ void updateDisplay(winParam &wp)
     refresh();
 }
 
+/* Function: handleKeys
+ *
+ * This function handles any keypresses made by the user.
+ */
 void handleKeys(keys &k, winParam &wp)
 {
     timeout(wp.delay);
@@ -221,6 +249,11 @@ void handleKeys(keys &k, winParam &wp)
     }
 }
 
+/* Function: main
+ *
+ * Main function for the TUI. This will parse all the arguments
+ * and then go into a while loop processing update commands and key presses.
+ */
 int main(int argc, char** argv)
 {
     vector<string> argvString(0);

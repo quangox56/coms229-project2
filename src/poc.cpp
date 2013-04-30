@@ -1,3 +1,11 @@
+//**********************************************************
+//  poc.cpp
+//  
+//  Author: Ryan Scheel (rascheel@iastate.edu)
+//
+//  This was a proof of concept I created for my parsing.
+//
+//**********************************************************
 #include<iostream>
 #include<sstream>
 #include<vector>

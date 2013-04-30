@@ -1,3 +1,11 @@
+//**********************************************************
+//  conwaysGOL.h
+//  
+//  Author: Ryan Scheel (rascheel@iastate.edu)
+//
+//  FILE DESCRIPTION
+//
+//**********************************************************
 #ifndef CONWAYSGOL_H
 #define CONWAYSGOL_H
 #include"terrain.h"

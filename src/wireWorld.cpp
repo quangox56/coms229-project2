@@ -1,3 +1,11 @@
+//**********************************************************
+//  wireWorld.cpp
+//  
+//  Author: Ryan Scheel (rascheel@iastate.edu)
+//
+//  FILE DESCRIPTION
+//
+//**********************************************************
 #include"wireWorld.h"
 #include"common.h"
 #include<vector>

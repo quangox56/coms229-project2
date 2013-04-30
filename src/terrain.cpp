@@ -1,3 +1,11 @@
+//**********************************************************
+//  terrain.cpp
+//  
+//  Author: Ryan Scheel (rascheel@iastate.edu)
+//
+//  FILE DESCRIPTION
+//
+//**********************************************************
 #include"terrain.h"
 #include"conwaysGOL.h"
 #include"briansBrain.h"
