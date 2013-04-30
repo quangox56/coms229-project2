@@ -24,7 +24,6 @@ grid::grid(terrain &t, QWidget *parent) : QWidget(parent), terra(t)
     yRange = t.getWYRange();
     image = QImage(xRange.high-xRange.low+1, yRange.high-yRange.low+1, QImage::Format_ARGB32);
     updateImage();
-    update();
 
     QString *title = new QString(t.getName().c_str());
     setWindowTitle(*title);
@@ -45,7 +44,7 @@ void grid::updateImage()
             setImagePixel(pos, color);
         }
     }
-
+    update();
 }
 
 QSize grid::sizeHint() const
@@ -124,7 +123,6 @@ void grid::stepClicked()
     terra.simulate(1);
     optionsD->setGen(++generation);
     updateImage();
-    update();
 }
 
 void grid::playClicked()
