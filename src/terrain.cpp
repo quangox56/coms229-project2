@@ -444,61 +444,81 @@ void terrain::handleKeyword(istringstream& iss, string keyword)
                 iss.unget();
 
                 cell curState = STATE1;//default to state1
+                bool foundRightBracket = false;
                 
                 while(1) //This loop's condition is checked at the end
                 {        //with the final if statement
                     char stateStr[5];
-                    if(!(iss >> stateStr[0]))
+                    while(1)
                     {
-                        exitWithErr("There was an error in the Initial statement.");
-                    }
-
-                    //If the first character was a capital S then it might be a state
-                    //command. If it's not a state command then it's a malformed file.
-                    if(stateStr[0] == 'S')
-                    {
-                        for(int i = 1; i < 5; i++)
-                        {
-                            if(!(iss >> stateStr[i]))
-                            {
-                                exitWithErr("There was an error in the Initial statement.");
-                            }
-                        }
-                        if(stateStr[0] == 'S' &&
-                                stateStr[1] == 't' &&
-                                stateStr[2] == 'a' &&
-                                stateStr[3] == 't' &&
-                                stateStr[4] == 'e')
-                        {
-                            int state = -1;
-                            char semicolon;
-                            if(!(iss >> state) ||
-                                    !(iss >> semicolon))
-                            {
-                                exitWithErr("There was an error in the Initial statement.");
-                            }
-                            if(semicolon != ';')
-                            {
-                                exitWithErr("There was an error in the Initial statement.");
-                            }
-
-                            if(0 <= state && state < sim->numStates)
-                            {
-                                curState = (cell)state;
-                            }
-                            else
-                            {
-                                exitWithErr("State declared that is outside rules scope.");
-                            }
-                        }
-                        else
+                        if(!(iss >> stateStr[0]))
                         {
                             exitWithErr("There was an error in the Initial statement.");
                         }
+
+                        //If the first character was a capital S then it might be a state
+                        //command. If it's not a state command then it's a malformed file.
+                        if(stateStr[0] == 'S')
+                        {
+                            for(int i = 1; i < 5; i++)
+                            {
+                                if(!(iss >> stateStr[i]))
+                                {
+                                    exitWithErr("There was an error in the Initial statement.");
+                                }
+                            }
+                            if(stateStr[0] == 'S' &&
+                                    stateStr[1] == 't' &&
+                                    stateStr[2] == 'a' &&
+                                    stateStr[3] == 't' &&
+                                    stateStr[4] == 'e')
+                            {
+                                int state = -1;
+                                char semicolon;
+                                if(!(iss >> state) ||
+                                        !(iss >> semicolon))
+                                {
+                                    exitWithErr("There was an error in the Initial statement.");
+                                }
+                                if(semicolon != ';')
+                                {
+                                    exitWithErr("There was an error in the Initial statement.");
+                                }
+
+                                if(0 <= state && state < sim->numStates)
+                                {
+                                    curState = (cell)state;
+                                }
+                                else
+                                {
+                                    exitWithErr("State declared that is outside rules scope.");
+                                }
+                            }
+                            else
+                            {
+                                exitWithErr("There was an error in the Initial statement.");
+                            }
+                        }
+                        else//else if it wan't an S then put it back and continue with
+                        {   //normal parsing
+
+                            //if it was a right bracket then we had a state declararation
+                            //right before the end bracket so we need to break out of the
+                            //outer loop
+                            if(stateStr[0] == '}')
+                            {
+                                foundRightBracket = true;
+                            }
+                            else
+                            {
+                                iss.unget();
+                            }
+                            break;
+                        }
                     }
-                    else//else if it wan't an S then put it back and continue with
-                    {   //normal parsing
-                        iss.unget();
+                    if(foundRightBracket)
+                    {
+                        break;
                     }
 
                     //parse the Y value
