@@ -38,6 +38,6 @@ class wireWorld : public terrain::simulator
          * This function determines the next state of the cell at coordinates (x,y) based on
          * Wire World rules.
          */
-        cell getNextSate(int x, int y);
+        cell getNextState(int x, int y);
 };
 #endif
