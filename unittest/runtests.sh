@@ -1,6 +1,6 @@
 #!/bin/bash
 
-showgen=../showgen
+showgen=../bin/showgen
 
 result_suffix="result"
 expected_suffix="expected"
