@@ -58,3 +58,6 @@ clean:
 
 test: all
 	cd unittest; ./runtests.sh
+
+tarball: clean
+	cd ..; tar -cvzf rascheelProject2.tgz coms229-project2
