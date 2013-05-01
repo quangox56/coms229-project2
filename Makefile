@@ -57,4 +57,4 @@ clean:
 	rm -f src/sim-gui/sim-gui.pro
 
 test: all
-	python test/fuzzy.py test bin
+	./unittest/runtests.sh

@@ -1,0 +1,4 @@
+Xrange 0 10;
+Yrange 0 10;
+Initial {
+};

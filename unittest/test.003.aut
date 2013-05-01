@@ -1,0 +1,10 @@
+Name "Test Example";
+Xrange 0 10;
+Yrange 0 10;
+Rules ConwaysLife;
+Chars 46, 64;
+Colors (255, 255, 255), (0, 0, 0);
+Initial {
+	State 1;
+	Y = 1: 2, 3;
+};
