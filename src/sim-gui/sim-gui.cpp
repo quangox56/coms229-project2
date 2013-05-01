@@ -97,7 +97,7 @@ int main(int argc, char *argv[])
     scrollArea.viewport()->setAutoFillBackground(true);
     scrollArea.setWindowTitle(QObject::tr(terra.getName().c_str()));
     scrollArea.show();
-    QObject::connect( qApp, SIGNAL(lastWindowClosed()), qApp, SLOT(quit()) );
+    QObject::connect( app, SIGNAL(lastWindowClosed()), app, SLOT(quit()) );
 
     return app.exec();
 }
