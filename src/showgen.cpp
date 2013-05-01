@@ -21,6 +21,10 @@
 
 using namespace std;
 
+/* Function: main
+ *
+ * This is the main function for showgen. It parses the arguments and setups the usage of the terrain class.
+ */
 int main(int argc, char** argv)
 {
     vector<string> argvString(0);
@@ -46,8 +50,20 @@ int main(int argc, char** argv)
 
     if(hFlag)
     {
-        //TODO: PRINT HELP TEXT
-        cout << "help flag" << endl;
+        string help = "showgen\n\n"
+                      "This program reads a single .aut file, either from a pathname\n"
+                      "passed as an argument, or from standard input if no file names\n"
+                      "given as arguments.\n\n"
+                      "Allowable switches:\n"
+                      "\t-a     \t\toutput in .aut format, otherwise output an ASCII grid.\n"
+                      "\t-g n   \t\tsimulate for n generations, if ommitted defaults to 0.\n"
+                      "\t-h     \t\tdisplay this help screen.\n"
+                      "\t-tx l,h\t\tset the x range of the terrain, overrides .aut.\n"
+                      "\t-ty l,h\t\tset the y range of the terrain, overrides .aut.\n"
+                      "\t-wx l,h\t\tset the x range of the output window, otherwise default to terrain.\n"
+                      "\t-wy l,h\t\tset the y range of the output window, otherwise default to terrain.\n";
+
+        cout << help << endl;
         exit(0);
     }
     if(gFlag)

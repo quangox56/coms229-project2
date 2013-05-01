@@ -269,8 +269,15 @@ int main(int argc, char** argv)
 
     if(hFlag)
     {
-        //TODO: PRINT HELP TEXT
-        cout << "help flag" << endl;
+        string help = "simtui\n\n"
+                      "This program reads a single .aut file, either from a pathname\n"
+                      "passed as an argument, or from standard input if no file names\n"
+                      "given as arguments. Then provides a tui for simulating.\n\n"
+                      "Allowable switches:\n"
+                      "\t-h     \t\tdisplay this help screen.\n"
+                      "\t-tx l,h\t\tset the x range of the terrain, overrides .aut.\n"
+                      "\t-ty l,h\t\tset the y range of the terrain, overrides .aut.\n";
+        cout << help << endl;
         exit(0);
     }
 

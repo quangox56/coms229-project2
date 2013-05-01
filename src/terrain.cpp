@@ -3,7 +3,9 @@
 //  
 //  Author: Ryan Scheel (rascheel@iastate.edu)
 //
-//  FILE DESCRIPTION
+//  Main source code for the project. This contains the code
+//  for the aut parsing, terrain holding, and parsing.
+//  Refer to terrain.h for function comments.
 //
 //**********************************************************
 #include"terrain.h"

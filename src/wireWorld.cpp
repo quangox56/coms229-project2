@@ -3,7 +3,8 @@
 //  
 //  Author: Ryan Scheel (rascheel@iastate.edu)
 //
-//  FILE DESCRIPTION
+//  Contains the source code for the Wire World
+//  simulator. Reference wireWorld.h for function comments.
 //
 //**********************************************************
 #include"wireWorld.h"
