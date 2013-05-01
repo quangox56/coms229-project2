@@ -3,11 +3,11 @@ Ryan Scheel - rascheel@iastate.edu - 971814844
 ================
 OVERVIEW
 
-All source code is in ./src, sim-gui and the gui code is in src/sim-gui/
+All source code is in ./src/, sim-gui and the gui code is in src/sim-gui/
 
-After calling make the executables will be placed in the ./bin 
-directory and .o files will be placed in the ./obj directory.
-The ./bin and ./obj directories will be deleted after running a 
+After calling make the executables will be placed in the ./bin/
+directory and .o files will be placed in the ./obj/ directory.
+The ./bin/ and ./obj/ directories will be deleted after running a 
 make clean.
 
 make - builds everything
@@ -15,8 +15,9 @@ make clean - cleans all generated files
 make test - runs some rudimentary tests
 make tarball - builds tarball for final submission
 
+source.sh is a script I use to setup my working environment
 ================
-FILE DESCRIPTIONS
+SOURCE CODE DESCRIPTIONS
 
 common.h/common.cpp - These contain some structs useful structs that are used all over,
                       and some common functions that are useful like an exitWithError function.
