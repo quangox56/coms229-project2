@@ -8,6 +8,7 @@
 //  This code also handles all required argument processing.
 //
 //**********************************************************
+#include <QApplication>
 #include <QScrollArea>
 #include "grid.h"
 
