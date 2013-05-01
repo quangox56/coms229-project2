@@ -57,4 +57,4 @@ clean:
 	rm -f src/sim-gui/sim-gui.pro
 
 test: all
-	./unittest/runtests.sh
+	cd unittest; ./runtests.sh
